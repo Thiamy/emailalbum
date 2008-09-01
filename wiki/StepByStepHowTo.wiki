@@ -1,6 +1,5 @@
-#Step by Step How-To create and send an EmailAlbum.
 
-= Step by step EmailAlbum How-to.
+=Step by step EmailAlbum How-to.=
 
 You must have a Java JRE v1.4.2 or higher (Java 6 is recommended for better performance) installed on your computer : http://www.java.com/
 
