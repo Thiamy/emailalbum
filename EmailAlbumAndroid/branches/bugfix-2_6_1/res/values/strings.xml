@@ -102,6 +102,8 @@
 		managed with ACRA : http://acra.googlecode.com\n
 	</string>
 	<string name="changelog">
+		Fixed in version 2.8.1:\n
+		- Viewer was broken on Android 1.5 devices due to introduction of dynamics. Should now be ok.\n
 		New in version 2.8.0:\n
 		- Added dynamic behaviours to slideshow zooming/panning\n
 		- Better handling of bitmap loading errors while creating album. Images are skipped and album generation should continue.

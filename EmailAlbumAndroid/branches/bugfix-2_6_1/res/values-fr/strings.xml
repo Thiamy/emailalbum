@@ -95,6 +95,8 @@
 		\n
 	</string>
 	<string name="changelog">
+		Corrigé en version 2.8.1:\n
+		- La visionneuse ne fonctionnait plus sous Android 1.5 avec les déplacements dynamiques. Cela devrait maintenant être bon.\n
 		Nouveautés version 2.8.0:\n
 		- Ajout de comportements dynamiques sur les déplacements en mode zoom de la visionneuse.\n
 		- Meilleure gestion des erreurs de chargement d\'images à la génération d\'album. Les images en erreur sont ignorées et l\'album est tout de même généré.\n

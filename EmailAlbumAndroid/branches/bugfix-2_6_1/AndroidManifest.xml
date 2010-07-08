@@ -2,7 +2,7 @@
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	package="com.kg.emailalbum.mobile" android:installLocation="auto"
-	android:versionName="2.8.0" android:versionCode="37">
+	android:versionName="2.8.1" android:versionCode="38">
 	<uses-sdk android:minSdkVersion="3" android:targetSdkVersion="8"
 		android:debuggable="true" />
 
