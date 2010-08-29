@@ -20,9 +20,11 @@ package com.kg.emailalbum.mobile.creator;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -35,6 +37,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -45,24 +48,23 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 
 import com.kg.emailalbum.mobile.R;
 import com.kg.emailalbum.mobile.util.BitmapLoader;
-import com.kg.emailalbum.mobile.util.CacheMap;
 
 /**
  * Allows the user to select multiple pictures from the Media Library. This
@@ -77,6 +79,8 @@ import com.kg.emailalbum.mobile.util.CacheMap;
  * @author Kevin Gaudin
  */
 public class SelectPictures extends Activity {
+    
+    public static Bitmap ROBOT;
 
     /**
      * A specific adapter for this list based activity.
@@ -116,7 +120,7 @@ public class SelectPictures extends Activity {
             protected void onPostExecute(Uri result) {
                 super.onPostExecute(result);
                 // Give the retrieved thumbnail to the adapter...
-                mImageAdapter.updateCache(mUri, result);
+                mImageAdapter.updateThumbUri(mUri, result);
                 // then process any other pending thumbnail request.
                 if (!mPendingThumbnailRequests.isEmpty()) {
                     mThmGetter = new ThumbnailGetter();
@@ -135,12 +139,6 @@ public class SelectPictures extends Activity {
             ImageView checkableImage = null;
             CheckBox imageCheck = null;
         }
-
-        /** Number of Thumbnails to wipe from cache when cache is full */
-        private static final int THUMBS_CACHE_REVOC_SIZE = 6;
-
-        /** Number of Thumbnails to keep in cache */
-        private static final int THUMBS_CACHE_SIZE = 32;;
 
         private final String LOG_TAG = MultiSelectImageAdapter.class
                 .getSimpleName();
@@ -198,13 +196,9 @@ public class SelectPictures extends Activity {
         };
 
         /**
-         * We store Bitmaps of the Thumbnails in this cache.
-         * 
-         * TODO: check that this is still necessary now that
-         * {@link BitmapLoader} manages its own cache...
+         * We store Bitmaps Uris of Thumbnails in this cache.
          */
-        private CacheMap<Uri, Uri> mThumbsUris = new CacheMap<Uri, Uri>(
-                THUMBS_CACHE_SIZE, THUMBS_CACHE_REVOC_SIZE);
+        private Map<Uri, Uri> mThumbsUris = new HashMap<Uri, Uri>();
 
         /**
          * Create a new adapter with the given context and UI handler. The owner
@@ -371,6 +365,9 @@ public class SelectPictures extends Activity {
                 try {
                     Bitmap thumb = BitmapLoader.load(mContext, thumbUri, null,
                             null);
+                    if(thumb == null) {
+                        thumb = ROBOT;
+                    }
                     vh.checkableImage.setImageBitmap(thumb);
                 } catch (IOException e) {
                     Log.e(LOG_TAG, "Error : ", e);
@@ -450,14 +447,14 @@ public class SelectPictures extends Activity {
         }
 
         /**
-         * Update the thumbnail for an item.
+         * Update the thumbnail Uri for an item.
          * 
          * @param uri
          *            The Uri of the item.
          * @param thumbUri
          *            The Bitmap containing the thumbnail.
          */
-        public void updateCache(Uri uri, Uri thumbUri) {
+        public void updateThumbUri(Uri uri, Uri thumbUri) {
             if (uri != null && thumbUri != null) {
                 mThumbsUris.put(uri, thumbUri);
                 mPendingThumbnailRequests.remove(uri);
@@ -653,6 +650,7 @@ public class SelectPictures extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ROBOT = BitmapFactory.decodeResource(SelectPictures.this.getResources(), R.drawable.robot_error);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setTitle(R.string.btn_pick_pictures);
         setResult(RESULT_CANCELED);
@@ -911,7 +909,9 @@ public class SelectPictures extends Activity {
             protected void onPostExecute(Bitmap result) {
                 mPreviewPic = result;
                 removeDialog(DIALOG_WAIT_PREVIEW);
-                showDialog(DIALOG_IMAGE_PREVIEW);
+                if(mPreviewPic != null) {
+                    showDialog(DIALOG_IMAGE_PREVIEW);
+                }
             }
 
         };
