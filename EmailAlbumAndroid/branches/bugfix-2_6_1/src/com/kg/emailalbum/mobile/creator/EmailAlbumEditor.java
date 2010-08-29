@@ -36,6 +36,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import org.acra.CrashReportingApplication;
 import org.acra.ErrorReporter;
 
 import android.app.Activity;
@@ -57,6 +58,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Looper;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.text.format.DateFormat;
@@ -84,6 +86,7 @@ import com.kg.emailalbum.mobile.util.CacheManager;
 import com.kg.emailalbum.mobile.util.Compatibility;
 import com.kg.emailalbum.mobile.util.HumanReadableProperties;
 import com.kg.emailalbum.mobile.util.IntentHelper;
+import com.kg.emailalbum.mobile.util.Toaster;
 import com.kg.oifilemanager.filemanager.FileManagerProvider;
 import com.kg.oifilemanager.intents.FileManagerIntents;
 
@@ -493,6 +496,8 @@ public class EmailAlbumEditor extends ListActivity implements
      * Asynchronous task for exporting current album to an EmailAlbum jar file.
      */
     public class ExportAlbumTask extends AsyncTask<File, Integer, Uri> {
+        
+        
         // These constants are used to tell the task that it has to send
         // the result album or only store it.
         /**
@@ -594,7 +599,7 @@ public class EmailAlbumEditor extends ListActivity implements
                                 ErrorReporter.getInstance().addCustomData("mPictureSize.getWidth()", ""+mPictureSize.getWidth());
                                 ErrorReporter.getInstance().addCustomData("mPictureSize.getHeight()", ""+mPictureSize.getHeight());
                                 ErrorReporter.getInstance().handleException(new Exception("Could not load image while creating archive! (BitmapLoader result is null)"));
-                                Toast.makeText(EmailAlbumEditor.this, R.string.album_creation_image_error, Toast.LENGTH_SHORT).show();
+                                new Toaster(EmailAlbumEditor.this, R.string.album_creation_image_error, Toast.LENGTH_LONG).start();
                             }
                             itemNumber++;
                             publishProgress((int) (((float) itemNumber / (float) count) * 100));
@@ -658,7 +663,6 @@ public class EmailAlbumEditor extends ListActivity implements
 
                     String entryName = "";
                     int itemNumber = 0;
-                    BitmapLoader.onLowMemory();
                     synchronized (mAdapter.mContentModel) {
                         for (AlbumItem item : mAdapter.mContentModel) {
                             ErrorReporter.getInstance().addCustomData(
@@ -710,7 +714,7 @@ public class EmailAlbumEditor extends ListActivity implements
                                 ErrorReporter.getInstance().addCustomData("mPictureSize.getWidth()", ""+mPictureSize.getWidth());
                                 ErrorReporter.getInstance().addCustomData("mPictureSize.getHeight()", ""+mPictureSize.getHeight());
                                 ErrorReporter.getInstance().handleException(new Exception("Could not load image while creating archive! (BitmapLoader result is null)"));
-                                Toast.makeText(EmailAlbumEditor.this, R.string.album_creation_image_error, Toast.LENGTH_SHORT).show();
+                                new Toaster(EmailAlbumEditor.this, R.string.album_creation_image_error, Toast.LENGTH_LONG).start();
                             }
                             itemNumber++;
                             publishProgress((int) (((float) (entryNumber + itemNumber) / (float) count) * 100));
@@ -742,7 +746,11 @@ public class EmailAlbumEditor extends ListActivity implements
         @Override
         protected void onPostExecute(Uri result) {
             // Album generation done, close the progress dialog
-            dismissDialog(DIALOG_PROGRESS_EXPORT);
+            try {
+                dismissDialog(DIALOG_PROGRESS_EXPORT);
+            } catch(IllegalArgumentException e) {
+                // do nothing
+            }
             // Optionally send the resulting file if the user requested it
             if (mReason == SEND) {
                 sendAlbum(result);
@@ -1161,17 +1169,6 @@ public class EmailAlbumEditor extends ListActivity implements
         return result;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see android.app.Activity#onLowMemory()
-     */
-    @Override
-    public void onLowMemory() {
-        super.onLowMemory();
-        // The BitmapLoader might have some caches to clear.
-        BitmapLoader.onLowMemory();
-    }
 
     /*
      * (non-Javadoc)

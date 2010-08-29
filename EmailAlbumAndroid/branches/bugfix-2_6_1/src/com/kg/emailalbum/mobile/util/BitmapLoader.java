@@ -28,10 +28,10 @@ import org.acra.ErrorReporter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Bitmap.Config;
-import android.graphics.BitmapFactory.Options;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
 
@@ -51,47 +51,16 @@ import android.view.WindowManager;
 public class BitmapLoader {
 
     /**
-     * The results from the first pass : final dimension of the picture fitting
-     * the requested dimension, preserving the picture aspect ratio.
-     * 
-     * @author Normal
-     * 
-     */
-    private class FirstPassResult {
-        /** The picture width calculated to fit in the requested dimensions. */
-        public int finalHeight = 0;
-        /** The picture height calculated to fit in the requested dimensions. */
-        public int finalWidth = 0;
-        /**
-         * Options containing the best downsampling factor to avoid loading the
-         * full picture.
-         */
-        public Options options = new Options();
-
-        @Override
-        public String toString() {
-            return "{finalWidth=" + finalWidth + ", finalHeight=" + finalHeight
-                    + ", options={inSampleSize=" + options.inSampleSize + "}}";
-        }
-    }
-
-    /**
      * A cache for storing the latest accessed bitmaps. If another call asks for
      * a larger resolution, we reload it and keep the latest.
      */
-    private static CacheMap<Uri, Bitmap> bmpCache = new CacheMap<Uri, Bitmap>(
-            20, 3);
+    private static NewLRUCache<String, Bitmap> bmpCache = new NewLRUCache<String, Bitmap>(200);
     /**
      * A cache for storing real dimensions of all accessed bitmaps. With this
      * the cost of the first pass is reduced when loading a previously accessed
      * picture.
      */
-    private static ConcurrentHashMap<Uri, int[]> dimensionCache = new ConcurrentHashMap<Uri, int[]>();
-
-    /**
-     * Singleton... just for allowing the instanciation of inner classes...
-     */
-    private static BitmapLoader instance = new BitmapLoader();
+    private static ConcurrentHashMap<String, int[]> dimensionCache = new ConcurrentHashMap<String, int[]>();
 
     private static final String LOG_TAG = BitmapLoader.class.getSimpleName();
 
@@ -116,7 +85,7 @@ public class BitmapLoader {
     private static FirstPassResult firstPass(Context context, Integer width,
             Integer height, InputStream input, int[] cachedDimension)
             throws IOException {
-        FirstPassResult fpResult = instance.new FirstPassResult();
+        FirstPassResult fpResult = new FirstPassResult();
 
         // First, get image size
         fpResult.options.inJustDecodeBounds = true;
@@ -127,14 +96,18 @@ public class BitmapLoader {
             // + cachedDimension[1]);
         } else if (input != null) {
             // Log.d(LOG_TAG, "Fetching size...");
-            BitmapFactory.decodeStream(input, null, fpResult.options);
+            BitmapFactory.decodeStream(new FlushedInputStream(input), null, fpResult.options);
             // Log.d(LOG_TAG, "... size fetched.");
             input.close();
         }
         int srcWidth = fpResult.options.outWidth;
         int srcHeight = fpResult.options.outHeight;
-        ErrorReporter.getInstance().addCustomData("BitmapLoader.RequiredDim", width + " x " + height);
-        ErrorReporter.getInstance().addCustomData("BitmapLoader.SourceDim", srcWidth + " x " + srcHeight);
+
+        ErrorReporter.getInstance().addCustomData("BitmapLoader.RequiredDim",
+                width + " x " + height);
+        ErrorReporter.getInstance().addCustomData("BitmapLoader.SourceDim",
+                srcWidth + " x " + srcHeight);
+
         // Log.d(LOG_TAG, "Source picture has dimension " + srcWidth + " x "
         // + srcHeight);
 
@@ -193,7 +166,9 @@ public class BitmapLoader {
         // finer sampled bitmap
         if (srcWidth > fpResult.finalWidth) {
             fpResult.options.inSampleSize = srcWidth / fpResult.finalWidth;
-            ErrorReporter.getInstance().addCustomData("BitmapLoader.SampleSize", "" + fpResult.options.inSampleSize);
+            ErrorReporter.getInstance().addCustomData(
+                    "BitmapLoader.SampleSize",
+                    "" + fpResult.options.inSampleSize);
         }
         return fpResult;
     }
@@ -269,19 +244,20 @@ public class BitmapLoader {
             colorConfig = Bitmap.Config.RGB_565;
         }
 
-        InputStream input = context.getContentResolver().openInputStream(uri);
+        Log.d(LOG_TAG, "Open Uri" + uri.toString());
+        InputStream input = CustomContentResolver.openInputStream(context, uri);
 
         if (input == null)
             return null;
 
         InputStream fpInput = null;
         int[] cachedDimension = null;
-        if (!dimensionCache.containsKey(uri)) {
+        if (!dimensionCache.containsKey(uri.toString())) {
             fpInput = input;
         } else {
             // We already have the result of the first pass. We should not
             // preload anything more.
-            cachedDimension = dimensionCache.get(uri);
+            cachedDimension = dimensionCache.get(uri.toString());
             fpInput = null;
         }
 
@@ -290,7 +266,7 @@ public class BitmapLoader {
         int[] dimensionToCache = { fpResult.options.outWidth,
                 fpResult.options.outHeight };
         // Store the dimension in cache so we don't have to get it again
-        dimensionCache.put(uri, dimensionToCache);
+        dimensionCache.put(uri.toString(), dimensionToCache);
 
         if (fpInput == null) {
             // We first pass input is null, so we can reuse the original input
@@ -299,18 +275,28 @@ public class BitmapLoader {
         } else {
             // The original input stream has been consumed for the first pass.
             // Get a new one.
-            fpInput = context.getContentResolver().openInputStream(uri);
+            fpInput = CustomContentResolver.openInputStream(context, uri);
         }
 
         Bitmap cachedBitmap = null;
-        if (bmpCache.containsKey(uri)) {
-            cachedBitmap = bmpCache.get(uri);
+        //Log.d(LOG_TAG, "Check if " + uri.toString() + " is in cache.");
+        cachedBitmap = bmpCache.get(uri.toString());
+        boolean overWriteCache = true;
+        if (cachedBitmap != null) {
+            overWriteCache = false;
+            //Log.d(LOG_TAG, uri.toString() + " is in cache.");
+            cachedBitmap = bmpCache.get(uri.toString());
             // We have a Bitmap in cache, but we have to check if its resolution
             // is large enough.
-            if (cachedBitmap.getWidth() < fpResult.finalWidth
-                    || cachedBitmap.getHeight() < fpResult.finalHeight) {
+//            Log.d(LOG_TAG, (cachedBitmap.getWidth() + 1) + " < "
+//                    + fpResult.finalWidth + " || "
+//                    + (cachedBitmap.getHeight() + 1) + " < "
+//                    + fpResult.finalHeight);
+            if ((cachedBitmap.getWidth() + 1) < fpResult.finalWidth
+                    || (cachedBitmap.getHeight() + 1) < fpResult.finalHeight) {
                 // invalidate the existing entry
-                bmpCache.remove(uri);
+//                Log.d(LOG_TAG, uri.toString() + " is not big enough !");
+                overWriteCache = true;
                 cachedBitmap = null;
             }
 
@@ -319,8 +305,9 @@ public class BitmapLoader {
                 cachedBitmap);
 
         // Store the result in cache
-        if (cacheResult && result != null && !bmpCache.containsKey(uri)) {
-            bmpCache.put(uri, result);
+        if (cacheResult && result != null
+                && overWriteCache) {
+            bmpCache.put(uri.toString(), result);
         }
 
         return result;
@@ -358,23 +345,56 @@ public class BitmapLoader {
         if (input == null)
             return null;
 
+        String cacheKey = archive.getName() + "/" + entry.getName();
+        int[] cachedDimension = null;
+        if (dimensionCache.containsKey(cacheKey)) {
+            // We already have the result of the first pass. We should not
+            // preload anything more.
+            cachedDimension = dimensionCache.get(cacheKey);
+        }
         FirstPassResult fpResult = firstPass(context, width, height, input,
-                null);
+                cachedDimension);
+        int[] dimensionToCache = { fpResult.options.outWidth,
+                fpResult.options.outHeight };
+        // Store the dimension in cache so we don't have to get it again
+        dimensionCache.put(cacheKey, dimensionToCache);
 
         // Reload the input stream for the second pass
         input.close();
         input = ZipUtil.getInputStream(archive, entry);
 
-        result = secondPass(context, input, fpResult, Bitmap.Config.RGB_565,
-                null);
-        return result;
-    }
+        Bitmap cachedBitmap = null;
+//        Log.d(LOG_TAG, "Check if " + cacheKey + " is in cache.");
+        boolean overWriteCache = true;
+        cachedBitmap = bmpCache.get(cacheKey);
+        if (cachedBitmap != null) {
+            overWriteCache = false;
+//            Log.d(LOG_TAG, cacheKey + " is in cache.");
+            cachedBitmap = bmpCache.get(cacheKey);
+            // We have a Bitmap in cache, but we have to check if its resolution
+            // is large enough.
+//            Log.d(LOG_TAG, (cachedBitmap.getWidth() + 1) + " < "
+//                    + fpResult.finalWidth + " || "
+//                    + (cachedBitmap.getHeight() + 1) + " < "
+//                    + fpResult.finalHeight);
+            if ((cachedBitmap.getWidth() + 1) < fpResult.finalWidth
+                    || (cachedBitmap.getHeight() + 1) < fpResult.finalHeight) {
+                // invalidate the existing entry
+//                Log.d(LOG_TAG, cacheKey + " is not big enough !");
+                overWriteCache = true;
+                cachedBitmap = null;
+            }
 
-    /**
-     * Let's free some heavy bitmaps...
-     */
-    public static void onLowMemory() {
-        bmpCache.clear();
+        }
+
+        result = secondPass(context, input, fpResult, Bitmap.Config.RGB_565,
+                cachedBitmap);
+
+        // Store the result in cache
+        if (result != null && overWriteCache) {
+            bmpCache.put(cacheKey, result);
+        }
+        return result;
     }
 
     /**
@@ -414,10 +434,9 @@ public class BitmapLoader {
 
             Bitmap source = cachedBitmap;
             if (source == null) {
-                // Log.d(LOG_TAG,
-                // "No cached bitmap to use, loading from stream");
+//                Log.d(LOG_TAG, "No cached bitmap to use, loading from stream");
                 // Log.d(LOG_TAG, "Decoding picture..." + fpResult);
-                source = BitmapFactory.decodeStream(input, null,
+                source = BitmapFactory.decodeStream(new FlushedInputStream(input), null,
                         fpResult.options);
                 // Log.d(LOG_TAG, "Picture decoded.");
                 input.close();
@@ -435,7 +454,7 @@ public class BitmapLoader {
                 } else {
                     result = source;
                 }
-                    
+
                 // Log.d(LOG_TAG, "Resized picture to dimension "
                 // + fpResult.finalWidth + " x " + fpResult.finalHeight);
             } else {
