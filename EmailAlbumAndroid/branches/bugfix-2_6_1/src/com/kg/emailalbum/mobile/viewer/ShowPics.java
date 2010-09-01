@@ -36,6 +36,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.graphics.drawable.BitmapDrawable;
@@ -86,9 +88,8 @@ import com.kg.oifilemanager.intents.FileManagerIntents;
  * @author Kevin Gaudin
  * 
  */
-public class ShowPics extends Activity implements OnGestureListener,
-        OnSharedPreferenceChangeListener, OnDoubleTapListener,
-        OnScaleGestureListener {
+public class ShowPics extends Activity implements OnGestureListener, OnSharedPreferenceChangeListener,
+        OnDoubleTapListener, OnScaleGestureListener {
     private static final float DOUBLE_TAP_ZOOM_FACTOR = 2.0f;
     private static final double ACTIVATE_ZOOM_THRESHOLD = 10.0;
     private static final float Z_TRANSLATE_3D = 1000.0f;
@@ -312,14 +313,12 @@ public class ShowPics extends Activity implements OnGestureListener,
      * animate pictures transitions.
      */
     private void initAnim() {
-        String animType = mPrefs.getString("animationtype",
-                getString(R.string.pref_def_anim));
+        String animType = mPrefs.getString("animationtype", getString(R.string.pref_def_anim));
 
         if (mSlideshow && mSlideshowRandomAnim) {
             // If in slideshow mode and with random transition selected by user,
             // let's pick a random animation.
-            String[] values = getResources().getStringArray(
-                    R.array.animationsvalues);
+            String[] values = getResources().getStringArray(R.array.animationsvalues);
             animType = values[(int) (Math.random() * (values.length - 1))];
         }
 
@@ -358,18 +357,14 @@ public class ShowPics extends Activity implements OnGestureListener,
     private void initAnimCarrousel() {
         // Preload all animations and set listener on only one of each in/out
         // pair as they are run simultaneously
-        mAnimNextIn = AnimationUtils.loadAnimation(getApplicationContext(),
-                R.anim.carrousel_right_in);
+        mAnimNextIn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.carrousel_right_in);
         mAnimNextIn.setAnimationListener(animListener);
         mAnimNextIn.setStartOffset(200);
-        mAnimCurrentFwdOut = AnimationUtils.loadAnimation(
-                getApplicationContext(), R.anim.carrousel_left_out);
-        mAnimPreviousIn = AnimationUtils.loadAnimation(getApplicationContext(),
-                R.anim.carrousel_left_in);
+        mAnimCurrentFwdOut = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.carrousel_left_out);
+        mAnimPreviousIn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.carrousel_left_in);
         mAnimPreviousIn.setStartOffset(200);
         mAnimPreviousIn.setAnimationListener(animListener);
-        mAnimCurrentBwdOut = AnimationUtils.loadAnimation(
-                getApplicationContext(), R.anim.carrousel_right_out);
+        mAnimCurrentBwdOut = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.carrousel_right_out);
     }
 
     /**
@@ -379,13 +374,10 @@ public class ShowPics extends Activity implements OnGestureListener,
         // Preload all animations and set listener on only one of each in/out
         // pair as they are
         // run simultaneously
-        mAnimNextIn = AnimationUtils.loadAnimation(getApplicationContext(),
-                R.anim.fade_in);
+        mAnimNextIn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in);
         mAnimNextIn.setAnimationListener(animListener);
-        mAnimCurrentFwdOut = AnimationUtils.loadAnimation(
-                getApplicationContext(), R.anim.fade_out);
-        mAnimPreviousIn = AnimationUtils.loadAnimation(getApplicationContext(),
-                R.anim.fade_in);
+        mAnimCurrentFwdOut = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_out);
+        mAnimPreviousIn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in);
         mAnimPreviousIn.setAnimationListener(animListener);
         mAnimCurrentBwdOut = mAnimCurrentFwdOut;
     }
@@ -397,16 +389,12 @@ public class ShowPics extends Activity implements OnGestureListener,
         // Preload all animations and set listener on only one of each in/out
         // pair as they are
         // run simultaneously
-        mAnimNextIn = AnimationUtils.loadAnimation(getApplicationContext(),
-                R.anim.rotate_left_in);
+        mAnimNextIn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate_left_in);
         mAnimNextIn.setAnimationListener(animListener);
-        mAnimCurrentFwdOut = AnimationUtils.loadAnimation(
-                getApplicationContext(), R.anim.rotate_left_out);
-        mAnimPreviousIn = AnimationUtils.loadAnimation(getApplicationContext(),
-                R.anim.rotate_right_in);
+        mAnimCurrentFwdOut = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate_left_out);
+        mAnimPreviousIn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate_right_in);
         mAnimPreviousIn.setAnimationListener(animListener);
-        mAnimCurrentBwdOut = AnimationUtils.loadAnimation(
-                getApplicationContext(), R.anim.rotate_right_out);
+        mAnimCurrentBwdOut = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate_right_out);
 
     }
 
@@ -417,13 +405,11 @@ public class ShowPics extends Activity implements OnGestureListener,
         // Preload all animations and set listener on only one of each in/out
         // pair as they are
         // run simultaneously
-        Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE))
-                .getDefaultDisplay();
+        Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
 
         float centerX = display.getWidth() / 2.0f;
         float centerY = display.getHeight() / 2.0f;
-        mAnimNextIn = new Rotate3dAnimation(90, 0, centerX, centerY,
-                Z_TRANSLATE_3D, false);
+        mAnimNextIn = new Rotate3dAnimation(90, 0, centerX, centerY, Z_TRANSLATE_3D, false);
         mAnimNextIn.setDuration(500);
         mAnimNextIn.setFillAfter(false);
         mAnimNextIn.setFillBefore(true);
@@ -431,15 +417,13 @@ public class ShowPics extends Activity implements OnGestureListener,
         mAnimNextIn.setInterpolator(new DecelerateInterpolator());
         mAnimNextIn.setAnimationListener(animListener);
 
-        mAnimCurrentFwdOut = new Rotate3dAnimation(0, -90, centerX, centerY,
-                Z_TRANSLATE_3D, true);
+        mAnimCurrentFwdOut = new Rotate3dAnimation(0, -90, centerX, centerY, Z_TRANSLATE_3D, true);
         mAnimCurrentFwdOut.setDuration(500);
         mAnimCurrentFwdOut.setFillAfter(false);
         mAnimCurrentFwdOut.setFillBefore(true);
         mAnimCurrentFwdOut.setInterpolator(new AccelerateInterpolator());
 
-        mAnimPreviousIn = new Rotate3dAnimation(-90, 0, centerX, centerY,
-                Z_TRANSLATE_3D, false);
+        mAnimPreviousIn = new Rotate3dAnimation(-90, 0, centerX, centerY, Z_TRANSLATE_3D, false);
         mAnimPreviousIn.setDuration(500);
         mAnimPreviousIn.setFillAfter(false);
         mAnimPreviousIn.setFillBefore(true);
@@ -447,8 +431,7 @@ public class ShowPics extends Activity implements OnGestureListener,
         mAnimPreviousIn.setInterpolator(new DecelerateInterpolator());
         mAnimPreviousIn.setAnimationListener(animListener);
 
-        mAnimCurrentBwdOut = new Rotate3dAnimation(0, 90, centerX, centerY,
-                Z_TRANSLATE_3D, true);
+        mAnimCurrentBwdOut = new Rotate3dAnimation(0, 90, centerX, centerY, Z_TRANSLATE_3D, true);
         mAnimCurrentBwdOut.setDuration(500);
         mAnimCurrentBwdOut.setFillAfter(false);
         mAnimCurrentBwdOut.setFillBefore(true);
@@ -462,16 +445,12 @@ public class ShowPics extends Activity implements OnGestureListener,
         // Preload all animations and set listener on only one of each in/out
         // pair as they are
         // run simultaneously
-        mAnimNextIn = AnimationUtils.loadAnimation(getApplicationContext(),
-                R.anim.push_left_in);
+        mAnimNextIn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.push_left_in);
         mAnimNextIn.setAnimationListener(animListener);
-        mAnimCurrentFwdOut = AnimationUtils.loadAnimation(
-                getApplicationContext(), R.anim.push_left_out);
-        mAnimPreviousIn = AnimationUtils.loadAnimation(getApplicationContext(),
-                R.anim.push_right_in);
+        mAnimCurrentFwdOut = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.push_left_out);
+        mAnimPreviousIn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.push_right_in);
         mAnimPreviousIn.setAnimationListener(animListener);
-        mAnimCurrentBwdOut = AnimationUtils.loadAnimation(
-                getApplicationContext(), R.anim.push_right_out);
+        mAnimCurrentBwdOut = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.push_right_out);
     }
 
     /**
@@ -481,41 +460,35 @@ public class ShowPics extends Activity implements OnGestureListener,
         // Preload all animations and set listener on only one of each in/out
         // pair as they are
         // run simultaneously
-        mAnimNextIn = AnimationUtils.loadAnimation(getApplicationContext(),
-                R.anim.push_left_in);
+        mAnimNextIn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.push_left_in);
         mAnimNextIn.setAnimationListener(animListener);
-        mAnimCurrentFwdOut = AnimationUtils.loadAnimation(
-                getApplicationContext(), R.anim.push_back);
-        mAnimPreviousIn = AnimationUtils.loadAnimation(getApplicationContext(),
-                R.anim.pull_front);
+        mAnimCurrentFwdOut = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.push_back);
+        mAnimPreviousIn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.pull_front);
         mAnimPreviousIn.setAnimationListener(animListener);
-        mAnimCurrentBwdOut = AnimationUtils.loadAnimation(
-                getApplicationContext(), R.anim.push_right_out);
+        mAnimCurrentBwdOut = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.push_right_out);
     }
 
     /**
      * Loads Animation objects.
      */
     private void initSlideshow() {
-        String prefPeriod = mPrefs.getString("slideshow_period", ""
-                + DEFAULT_SLIDESHOW_TIME);
+        String prefPeriod = mPrefs.getString("slideshow_period", "" + DEFAULT_SLIDESHOW_TIME);
         if (prefPeriod == null || "".equals(prefPeriod.trim())) {
             prefPeriod = "" + DEFAULT_SLIDESHOW_TIME;
         }
         mSlideshowPeriod = Long.parseLong(prefPeriod) * 1000;
         mSlideshowLoop = mPrefs.getBoolean("slideshow_loop", mSlideshowLoop);
-        mSlideshowRandomAnim = mPrefs.getBoolean("slideshow_random_animation",
-                mSlideshowRandomAnim);
+        mSlideshowRandomAnim = mPrefs.getBoolean("slideshow_random_animation", mSlideshowRandomAnim);
     }
 
     /**
      * Loads one picture.
      */
     private Bitmap loadPicture(int position) throws IOException {
-        Log.d(this.getClass().getName(), "Load image "
-                + mImageNames.get(mPosition));
-        Bitmap result = BitmapLoader.load(getApplicationContext(), archive,
-                archive.getEntry(mImageNames.get(position)), 900, 900);
+        Log.d(this.getClass().getName(), "Load image " + mImageNames.get(mPosition));
+        Uri imgUri = FileManagerProvider.getContentUri(archive.getName(), archive.getEntry(mImageNames.get(position))
+                .getName());
+        Bitmap result = BitmapLoader.load(getApplicationContext(), imgUri, 900, 900, Config.RGB_565, false);
         return result;
     }
 
@@ -536,10 +509,8 @@ public class ShowPics extends Activity implements OnGestureListener,
                 try {
                     savePicture(new File(Uri.parse(dirname).getEncodedPath()));
                 } catch (IOException e) {
-                    Log.e(this.getClass().getName(),
-                            "onActivityResult() exception", e);
-                    Toast.makeText(this, e.getLocalizedMessage(),
-                            Toast.LENGTH_SHORT).show();
+                    Log.e(this.getClass().getName(), "onActivityResult() exception", e);
+                    Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -557,19 +528,18 @@ public class ShowPics extends Activity implements OnGestureListener,
         super.onCreate(savedInstanceState);
 
         mZoomListener = new ZoomListener(getApplicationContext());
-        
+
         // Get a full-screen window
         final Window win = getWindow();
-        win.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        win.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         setContentView(Compatibility.getShowPicsLayout());
 
         // Prevent device from sleeping during slideshow
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        mWakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK
-                + PowerManager.ON_AFTER_RELEASE, "EmailAlbum.SlideShow");
+        mWakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK + PowerManager.ON_AFTER_RELEASE,
+                "EmailAlbum.SlideShow");
 
         // Zoom handling
         mZoomListener.setZoomControl(mZoomControl);
@@ -597,8 +567,7 @@ public class ShowPics extends Activity implements OnGestureListener,
         mGestureScanner.setIsLongpressEnabled(true);
         // Handles multitouch zoom
 
-        mScaleGestureScanner = Compatibility
-                .getScaleGestureDetector(this, this);
+        mScaleGestureScanner = Compatibility.getScaleGestureDetector(this, this);
 
         mOldPosition = -1;
 
@@ -612,10 +581,8 @@ public class ShowPics extends Activity implements OnGestureListener,
 
         if (savedInstanceState != null) {
             mImageNames = savedInstanceState.getStringArrayList("PICS") != null ? savedInstanceState
-                    .getStringArrayList("PICS")
-                    : mImageNames;
-            mAlbumName = savedInstanceState.getString("ALBUM") != null ? savedInstanceState
-                    .getString("ALBUM")
+                    .getStringArrayList("PICS") : mImageNames;
+            mAlbumName = savedInstanceState.getString("ALBUM") != null ? savedInstanceState.getString("ALBUM")
                     : mAlbumName;
             mPosition = savedInstanceState.getInt("POSITION");
             mCaptions = savedInstanceState.getBundle("CAPTIONS");
@@ -624,14 +591,12 @@ public class ShowPics extends Activity implements OnGestureListener,
         }
 
         try {
-            File albumFile = new File(new URI(mAlbumName.toString().replace(
-                    " ", "%20")));
+            File albumFile = new File(new URI(mAlbumName.toString().replace(" ", "%20")));
             archive = new ZipFile(albumFile);
             showPicture();
         } catch (Exception e) {
             Log.e(this.getClass().getName(), "onCreate() exception", e);
-            Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_SHORT)
-                    .show();
+            Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -643,8 +608,7 @@ public class ShowPics extends Activity implements OnGestureListener,
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         boolean result = super.onCreateOptionsMenu(menu);
-        MenuItem item = menu.add(0, MENU_SLIDESHOW_ID, 0,
-                R.string.start_slideshow);
+        MenuItem item = menu.add(0, MENU_SLIDESHOW_ID, 0, R.string.start_slideshow);
         item.setIcon(android.R.drawable.ic_menu_slideshow);
         item = menu.add(0, MENU_SET_AS_ID, 0, R.string.menu_set_as);
         item.setIcon(android.R.drawable.ic_menu_set_as);
@@ -657,8 +621,7 @@ public class ShowPics extends Activity implements OnGestureListener,
         // Display an edit button only if an application is available
         Intent intent = new Intent(Intent.ACTION_EDIT);
         intent.setType("image/jpeg");
-        intent.setData(Uri.withAppendedPath(Images.Media.EXTERNAL_CONTENT_URI,
-                "1"));
+        intent.setData(Uri.withAppendedPath(Images.Media.EXTERNAL_CONTENT_URI, "1"));
         if (getPackageManager().resolveActivity(intent, 0) != null) {
             item = menu.add(0, MENU_EDIT_ID, 0, R.string.menu_edit);
             item.setIcon(android.R.drawable.ic_menu_edit);
@@ -684,11 +647,7 @@ public class ShowPics extends Activity implements OnGestureListener,
                 if (isFinishing()) {
                     Drawable toRecycle = view.getDrawable();
                     if (toRecycle != null) {
-                        Bitmap bmpToRecycle = ((BitmapDrawable) toRecycle)
-                                .getBitmap();
-                        if (bmpToRecycle != null) {
-                            bmpToRecycle.recycle();
-                        }
+                        toRecycle.setCallback(null);
                     }
                 }
             }
@@ -714,8 +673,7 @@ public class ShowPics extends Activity implements OnGestureListener,
      * MotionEvent, android.view.MotionEvent, float, float)
      */
     @Override
-    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-            float velocityY) {
+    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
         if (Math.abs(velocityX) > Math.abs(velocityY)) {
             // This is an horizontal fling
             if (velocityX < 0) {
@@ -732,14 +690,12 @@ public class ShowPics extends Activity implements OnGestureListener,
         } else {
             // This is a vertical fling
             float halfWidth = mImgViews[curPic].getWidth() / 2;
-            if ((velocityY < 0 && e1.getX() > halfWidth)
-                    || (velocityY > 0 && e1.getX() < halfWidth)) {
+            if ((velocityY < 0 && e1.getX() > halfWidth) || (velocityY > 0 && e1.getX() < halfWidth)) {
                 // Rotate counter clockwise
                 mHandler.removeCallbacks(slideshowCallback);
                 rotate(-90);
                 return true;
-            } else if ((velocityY > 0 && e1.getX() > halfWidth)
-                    || (velocityY < 0 && e1.getX() < halfWidth)) {
+            } else if ((velocityY > 0 && e1.getX() > halfWidth) || (velocityY < 0 && e1.getX() < halfWidth)) {
                 // From up to down => rotate clockwise
                 mHandler.removeCallbacks(slideshowCallback);
                 rotate(90);
@@ -803,8 +759,7 @@ public class ShowPics extends Activity implements OnGestureListener,
         if (!mMTZoomMode
                 && (!mPanMode || (Math.abs(mDownPoint.x - mLatestPoint.x) < ACTIVATE_ZOOM_THRESHOLD && Math
                         .abs(mDownPoint.y - mLatestPoint.y) < ACTIVATE_ZOOM_THRESHOLD))) {
-            mImgViews[curPic]
-                    .performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+            mImgViews[curPic].performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
             setZoomMode(true);
         }
     }
@@ -841,12 +796,9 @@ public class ShowPics extends Activity implements OnGestureListener,
         switch (item.getItemId()) {
         case MENU_SAVE_ID:
             intent = new Intent(FileManagerIntents.ACTION_PICK_DIRECTORY);
-            intent.setData(Uri.fromFile(android.os.Environment
-                    .getExternalStorageDirectory()));
-            intent.putExtra(FileManagerIntents.EXTRA_TITLE,
-                    getText(R.string.select_directory));
-            intent.putExtra(FileManagerIntents.EXTRA_BUTTON_TEXT,
-                    getText(R.string.btn_select_directory));
+            intent.setData(Uri.fromFile(android.os.Environment.getExternalStorageDirectory()));
+            intent.putExtra(FileManagerIntents.EXTRA_TITLE, getText(R.string.select_directory));
+            intent.putExtra(FileManagerIntents.EXTRA_BUTTON_TEXT, getText(R.string.btn_select_directory));
             try {
                 startActivityForResult(intent, ACTIVITY_PICK_DIRECTORY_TO_SAVE);
             } catch (ActivityNotFoundException e) {
@@ -859,8 +811,7 @@ public class ShowPics extends Activity implements OnGestureListener,
             try {
                 String title = getString(R.string.chooser_share);
                 Uri fileUri = FileManagerProvider
-                        .getContentUri(saveTmpPicture(new CacheManager(
-                                getApplicationContext()).getCacheDir("viewer")));
+                        .getContentUri(saveTmpPicture(new CacheManager(getApplicationContext()).getCacheDir("viewer")));
                 if (item.getItemId() == MENU_SEND_ID) {
                     intent = new Intent(Intent.ACTION_SEND, fileUri);
                     intent.putExtra(Intent.EXTRA_STREAM, fileUri);
@@ -872,19 +823,15 @@ public class ShowPics extends Activity implements OnGestureListener,
                     intent = new Intent(Intent.ACTION_EDIT);
                     title = getString(R.string.menu_edit);
 
-                    Toast.makeText(getApplicationContext(),
-                            R.string.alert_editor, Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), R.string.alert_editor, Toast.LENGTH_LONG).show();
                     intent.setDataAndType(fileUri, "image/jpeg");
                 }
                 startActivity(Intent.createChooser(intent, title));
 
             } catch (IOException e) {
                 Log.e(this.getClass().getName(), "other intents exception", e);
-                Toast.makeText(
-                        this,
-                        getText(R.string.error_other_intents) + " : "
-                                + e.getLocalizedMessage(), Toast.LENGTH_SHORT)
-                        .show();
+                Toast.makeText(this, getText(R.string.error_other_intents) + " : " + e.getLocalizedMessage(),
+                        Toast.LENGTH_SHORT).show();
             }
 
             return true;
@@ -898,26 +845,19 @@ public class ShowPics extends Activity implements OnGestureListener,
             return true;
         case MENU_OPEN_WITH_ID:
             try {
-                Uri fileUri = Uri.withAppendedPath(
-                        FileManagerProvider.CONTENT_URI, saveTmpPicture(
-                                new CacheManager(getApplicationContext())
-                                        .getCacheDir("viewer"))
+                Uri fileUri = Uri.withAppendedPath(FileManagerProvider.CONTENT_URI,
+                        saveTmpPicture(new CacheManager(getApplicationContext()).getCacheDir("viewer"))
                                 .getAbsolutePath());
                 Log.d(this.getClass().getSimpleName(), "Open Uri : " + fileUri);
                 CharSequence title = null;
                 intent = new Intent(Intent.ACTION_VIEW);
                 title = getText(R.string.menu_open_with);
-                Toast.makeText(getApplicationContext(),
-                        R.string.alert_different_viewer, Toast.LENGTH_LONG)
-                        .show();
+                Toast.makeText(getApplicationContext(), R.string.alert_different_viewer, Toast.LENGTH_LONG).show();
                 intent.setDataAndType(fileUri, "image/jpeg");
                 startActivity(Intent.createChooser(intent, title));
             } catch (IOException e) {
-                Log.e(this.getClass().getSimpleName(),
-                        "Error while creating temp file", e);
-                Toast.makeText(getApplicationContext(),
-                        "Error while creating temp file.", Toast.LENGTH_LONG)
-                        .show();
+                Log.e(this.getClass().getSimpleName(), "Error while creating temp file", e);
+                Toast.makeText(getApplicationContext(), "Error while creating temp file.", Toast.LENGTH_LONG).show();
             }
             return true;
         case MENU_SLIDESHOW_ID:
@@ -992,8 +932,7 @@ public class ShowPics extends Activity implements OnGestureListener,
      * MotionEvent, android.view.MotionEvent, float, float)
      */
     @Override
-    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
-            float distanceY) {
+    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
         // NOT USED
         return false;
     }
@@ -1006,13 +945,11 @@ public class ShowPics extends Activity implements OnGestureListener,
      * java.lang.String)
      */
     @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
-            String key) {
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if ("animationtype".equals(key)) {
             // User chose a different animaton for transitions
             initAnim();
-        } else if ("slideshow_period".equals(key)
-                || "slideshow_loop".equals(key)
+        } else if ("slideshow_period".equals(key) || "slideshow_loop".equals(key)
                 || "slideshow_random_animation".equals(key)) {
             // User changed a slideshow parameter
             initSlideshow();
@@ -1117,24 +1054,25 @@ public class ShowPics extends Activity implements OnGestureListener,
                 nextPic = (nextPic + 1) % 3;
                 if (mPosition + 1 < mImageNames.size()) {
                     if (mImgViews[nextPic].getDrawable() != null) {
-                        if (((BitmapDrawable) mImgViews[nextPic].getDrawable())
-                                .getBitmap() != null) {
+                        if (((BitmapDrawable) mImgViews[nextPic].getDrawable()).getBitmap() != null) {
+                            mImgViews[nextPic].getDrawable().setCallback(null);
                             // nextPic currently contains the picture previous
                             // to the previous picture. Discard it.
-                            ((BitmapDrawable) mImgViews[nextPic].getDrawable())
-                                    .getBitmap().recycle();
+                            // ((BitmapDrawable)
+                            // mImgViews[nextPic].getDrawable())
+                            // .getBitmap().recycle();
                         }
                     }
                     // Preload next picture
-                    mImgViews[nextPic]
-                            .setImageBitmap(loadPicture(mPosition + 1));
+                    mImgViews[nextPic].setImageBitmap(loadPicture(mPosition + 1));
                 } else if (mSlideshowLoop) {
                     // prepare for looping
                     if (mImgViews[nextPic].getDrawable() != null) {
-                        if (((BitmapDrawable) mImgViews[nextPic].getDrawable())
-                                .getBitmap() != null) {
-                            ((BitmapDrawable) mImgViews[nextPic].getDrawable())
-                                    .getBitmap().recycle();
+                        if (((BitmapDrawable) mImgViews[nextPic].getDrawable()).getBitmap() != null) {
+                            mImgViews[nextPic].getDrawable().setCallback(null);
+                            // ((BitmapDrawable)
+                            // mImgViews[nextPic].getDrawable())
+                            // .getBitmap().recycle();
                         }
                     }
                     // We are at the end of the slideshow, just before looping.
@@ -1148,28 +1086,26 @@ public class ShowPics extends Activity implements OnGestureListener,
                 nextPic = (nextPic == 0) ? 2 : nextPic - 1;
                 if (mPosition - 1 >= 0) {
                     if (mImgViews[prevPic].getDrawable() != null) {
-                        if (((BitmapDrawable) mImgViews[prevPic].getDrawable())
-                                .getBitmap() != null) {
+                        if (((BitmapDrawable) mImgViews[prevPic].getDrawable()).getBitmap() != null) {
+                            mImgViews[prevPic].getDrawable().setCallback(null);
                             // prevPic now contains the picture next to the next
                             // picture.
                             // Discard it.
-                            ((BitmapDrawable) mImgViews[prevPic].getDrawable())
-                                    .getBitmap().recycle();
+                            // ((BitmapDrawable)
+                            // mImgViews[prevPic].getDrawable())
+                            // .getBitmap().recycle();
                         }
                     }
                     // Preload previous picture.
-                    mImgViews[prevPic]
-                            .setImageBitmap(loadPicture(mPosition - 1));
+                    mImgViews[prevPic].setImageBitmap(loadPicture(mPosition - 1));
                 }
             }
         } catch (Exception e) {
             Log.e(this.getClass().getName(), "ResetViews() exception", e);
-            Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_SHORT)
-                    .show();
+            Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
         } catch (OutOfMemoryError e) {
             Log.e(this.getClass().getName(), "showPicture() error", e);
-            Toast.makeText(this, R.string.error_out_of_mem, Toast.LENGTH_SHORT)
-                    .show();
+            Toast.makeText(this, R.string.error_out_of_mem, Toast.LENGTH_SHORT).show();
         }
 
         for (ImageZoomView imgView : mImgViews) {
@@ -1177,8 +1113,7 @@ public class ShowPics extends Activity implements OnGestureListener,
                 imgView.getDrawable().setDither(true);
                 imgView.getDrawable().setFilterBitmap(true);
                 imgView.setDrawingCacheEnabled(true);
-                imgView
-                        .setDrawingCacheQuality(ImageView.DRAWING_CACHE_QUALITY_HIGH);
+                imgView.setDrawingCacheQuality(ImageView.DRAWING_CACHE_QUALITY_HIGH);
             }
         }
         mZoomControl.getZoomState().reset();
@@ -1196,15 +1131,13 @@ public class ShowPics extends Activity implements OnGestureListener,
         try {
             Matrix rotMat = new Matrix();
             rotMat.postRotate(degrees);
-            BitmapDrawable curDrawable = (BitmapDrawable) mImgViews[curPic]
-                    .getDrawable();
+            BitmapDrawable curDrawable = (BitmapDrawable) mImgViews[curPic].getDrawable();
             if (curDrawable != null) {
                 Bitmap src = curDrawable.getBitmap();
                 if (src != null) {
-                    Bitmap dst = Bitmap.createBitmap(src, 0, 0, src.getWidth(),
-                            src.getHeight(), rotMat, false);
+                    Bitmap dst = Bitmap.createBitmap(src, 0, 0, src.getWidth(), src.getHeight(), rotMat, false);
                     mImgViews[curPic].setImageBitmap(dst);
-                    src.recycle();
+                    // src.recycle();
                 }
             }
         } catch (OutOfMemoryError e) {
@@ -1221,8 +1154,7 @@ public class ShowPics extends Activity implements OnGestureListener,
      * @throws FileNotFoundException
      * @throws IOException
      */
-    private File savePicture(File destDir) throws FileNotFoundException,
-            IOException {
+    private File savePicture(File destDir) throws FileNotFoundException, IOException {
         File destFile;
         String fileName = mImageNames.get(mPosition);
         int trailSlashIndex = fileName.lastIndexOf('/');
@@ -1232,8 +1164,7 @@ public class ShowPics extends Activity implements OnGestureListener,
         destFile = new File(destDir, fileName.toLowerCase());
 
         OutputStream destFileOS = new FileOutputStream(destFile);
-        InputStream imageIS = ZipUtil.getInputStream(archive, archive
-                .getEntry(mImageNames.get(mPosition)));
+        InputStream imageIS = ZipUtil.getInputStream(archive, archive.getEntry(mImageNames.get(mPosition)));
         byte[] buffer = new byte[2048];
         int len = 0;
         while ((len = imageIS.read(buffer)) >= 0) {
@@ -1306,16 +1237,14 @@ public class ShowPics extends Activity implements OnGestureListener,
     private void showCaption() {
         if (mCaptions != null) {
             // Show caption
-            String shortName = mImageNames.get(mPosition).substring(
-                    mImageNames.get(mPosition).lastIndexOf('/') + 1);
+            String shortName = mImageNames.get(mPosition).substring(mImageNames.get(mPosition).lastIndexOf('/') + 1);
             String caption = mCaptions.getString(shortName);
             if (caption != null && !"".equals(caption.trim())) {
                 if (mLatestCaption != null) {
                     mLatestCaption.cancel();
                 }
 
-                mLatestCaption = Toast.makeText(getApplicationContext(),
-                        caption, Toast.LENGTH_LONG);
+                mLatestCaption = Toast.makeText(getApplicationContext(), caption, Toast.LENGTH_LONG);
                 mLatestCaption.show();
             }
         }
@@ -1339,11 +1268,12 @@ public class ShowPics extends Activity implements OnGestureListener,
                     // Load first picture
                     if (mImgViews[curPic].getDrawable() != null) {
                         mImgViews[curPic].getDrawable().setCallback(null);
-                        Bitmap toRecycle = ((BitmapDrawable) mImgViews[curPic]
-                                .getDrawable()).getBitmap();
-                        if (toRecycle != null) {
-                            toRecycle.recycle();
-                        }
+                        // Bitmap toRecycle = ((BitmapDrawable)
+                        // mImgViews[curPic]
+                        // .getDrawable()).getBitmap();
+                        // if (toRecycle != null) {
+                        // toRecycle.recycle();
+                        // }
 
                     }
                     mImgViews[curPic].setImageBitmap(loadPicture(mPosition));
@@ -1352,19 +1282,16 @@ public class ShowPics extends Activity implements OnGestureListener,
                     if (!mNEMMode) {
                         // Load previous picture
                         if (mPosition > 0) {
-                            mImgViews[prevPic]
-                                    .setImageBitmap(loadPicture(mPosition - 1));
+                            mImgViews[prevPic].setImageBitmap(loadPicture(mPosition - 1));
                         }
 
                         // Load next picture
                         if (mPosition < mImageNames.size() - 1) {
-                            mImgViews[nextPic]
-                                    .setImageBitmap(loadPicture(mPosition + 1));
+                            mImgViews[nextPic].setImageBitmap(loadPicture(mPosition + 1));
                         }
                     }
                 }
-            } else if (mOldPosition < mPosition
-                    || ((mOldPosition == mImageNames.size() - 1) && mPosition == 0)) {
+            } else if (mOldPosition < mPosition || ((mOldPosition == mImageNames.size() - 1) && mPosition == 0)) {
                 // Going forward
                 applyTransition(FORWARD);
             } else if (mOldPosition > mPosition) {
@@ -1373,24 +1300,17 @@ public class ShowPics extends Activity implements OnGestureListener,
             }
 
             mImgViews[curPic].setZoomState(mZoomControl.getZoomState().reset());
-            mZoomControl.setAspectQuotient(mImgViews[curPic]
-                    .getAspectQuotient());
+            mZoomControl.setAspectQuotient(mImgViews[curPic].getAspectQuotient());
             showCaption();
         } catch (Exception e) {
             Log.e(this.getClass().getName(), "showPicture() exception", e);
-            Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_SHORT)
-                    .show();
+            Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
         } catch (OutOfMemoryError e) {
             Log.e(this.getClass().getName(), "showPicture() error", e);
-            Toast.makeText(this, R.string.error_out_of_mem, Toast.LENGTH_SHORT)
-                    .show();
-            if (!mNEMMode
-                    && ((BitmapDrawable) mImgViews[curPic].getDrawable())
-                            .getBitmap() != null) {
+            Toast.makeText(this, R.string.error_out_of_mem, Toast.LENGTH_SHORT).show();
+            if (!mNEMMode && ((BitmapDrawable) mImgViews[curPic].getDrawable()).getBitmap() != null) {
                 mNEMMode = true;
-                Toast
-                        .makeText(this, R.string.enter_nemmode,
-                                Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.enter_nemmode, Toast.LENGTH_SHORT).show();
             } else {
                 finish();
             }
@@ -1405,10 +1325,8 @@ public class ShowPics extends Activity implements OnGestureListener,
      * Launch the preferences screen.
      */
     private void startPreferencesActivity() {
-        Intent i = new Intent(getApplicationContext(),
-                EmailAlbumPreferences.class);
-        i.putExtra(EmailAlbumPreferences.EXTRA_SCREEN,
-                EmailAlbumPreferences.SCREEN_VIEWER);
+        Intent i = new Intent(getApplicationContext(), EmailAlbumPreferences.class);
+        i.putExtra(EmailAlbumPreferences.EXTRA_SCREEN, EmailAlbumPreferences.SCREEN_VIEWER);
 
         startActivity(i);
     }
@@ -1440,8 +1358,7 @@ public class ShowPics extends Activity implements OnGestureListener,
         if (mZoomControl.isZoomed()) {
             mZoomControl.getZoomState().reset();
         } else {
-            mZoomControl.zoom(DOUBLE_TAP_ZOOM_FACTOR, me.getX()
-                    / mImgViews[curPic].getWidth(), me.getY()
+            mZoomControl.zoom(DOUBLE_TAP_ZOOM_FACTOR, me.getX() / mImgViews[curPic].getWidth(), me.getY()
                     / mImgViews[curPic].getHeight());
         }
         return true;
@@ -1471,8 +1388,7 @@ public class ShowPics extends Activity implements OnGestureListener,
                 } else {
                     scale = Math.max(scale, 0.8f);
                 }
-                mZoomControl.zoom(scale, detector.getFocusX()
-                        / mImgViews[curPic].getWidth(), detector.getFocusY()
+                mZoomControl.zoom(scale, detector.getFocusX() / mImgViews[curPic].getWidth(), detector.getFocusY()
                         / mImgViews[curPic].getHeight());
                 return true;
             }

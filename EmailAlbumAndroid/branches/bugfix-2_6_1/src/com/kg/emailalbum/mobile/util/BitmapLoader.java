@@ -21,8 +21,6 @@ package com.kg.emailalbum.mobile.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 import org.acra.ErrorReporter;
 
@@ -279,8 +277,10 @@ public class BitmapLoader {
         }
 
         Bitmap cachedBitmap = null;
-        //Log.d(LOG_TAG, "Check if " + uri.toString() + " is in cache.");
-        cachedBitmap = bmpCache.get(uri.toString());
+        if(cacheResult) {
+            //Log.d(LOG_TAG, "Check if " + uri.toString() + " is in cache.");
+            cachedBitmap = bmpCache.get(uri.toString());
+        }
         boolean overWriteCache = true;
         if (cachedBitmap != null) {
             overWriteCache = false;
@@ -313,89 +313,6 @@ public class BitmapLoader {
         return result;
     }
 
-    /**
-     * Load a picture from the given Zip Archive. TODO: get rid of the temporary
-     * file as we don't need it anymore since the Uri is provided instead of an
-     * InputStream. TODO: add caching of dimensions and bitmaps.
-     * 
-     * @param context
-     *            The application context.
-     * @param archive
-     *            The archive where the picture is located.
-     * @param entry
-     *            The picture entry in this archive.
-     * @param width
-     *            The maximum width of the result bitmap. The original bitmap
-     *            will be scaled down with aspect ratio preserved to fit both
-     *            width/height. If null, the default value is the device screen
-     *            size.
-     * @param height
-     *            The maximum height of the result bitmap. The original bitmap
-     *            will be scaled down with aspect ratio preserved to fit both
-     *            width/height. If null, the default value is the device screen
-     *            size.
-     * @return
-     * @throws IOException
-     */
-    public static Bitmap load(Context context, ZipFile archive, ZipEntry entry,
-            Integer width, Integer height) throws IOException {
-        InputStream input = ZipUtil.getInputStream(archive, entry);
-
-        Bitmap result = null;
-        if (input == null)
-            return null;
-
-        String cacheKey = archive.getName() + "/" + entry.getName();
-        int[] cachedDimension = null;
-        if (dimensionCache.containsKey(cacheKey)) {
-            // We already have the result of the first pass. We should not
-            // preload anything more.
-            cachedDimension = dimensionCache.get(cacheKey);
-        }
-        FirstPassResult fpResult = firstPass(context, width, height, input,
-                cachedDimension);
-        int[] dimensionToCache = { fpResult.options.outWidth,
-                fpResult.options.outHeight };
-        // Store the dimension in cache so we don't have to get it again
-        dimensionCache.put(cacheKey, dimensionToCache);
-
-        // Reload the input stream for the second pass
-        input.close();
-        input = ZipUtil.getInputStream(archive, entry);
-
-        Bitmap cachedBitmap = null;
-//        Log.d(LOG_TAG, "Check if " + cacheKey + " is in cache.");
-        boolean overWriteCache = true;
-        cachedBitmap = bmpCache.get(cacheKey);
-        if (cachedBitmap != null) {
-            overWriteCache = false;
-//            Log.d(LOG_TAG, cacheKey + " is in cache.");
-            cachedBitmap = bmpCache.get(cacheKey);
-            // We have a Bitmap in cache, but we have to check if its resolution
-            // is large enough.
-//            Log.d(LOG_TAG, (cachedBitmap.getWidth() + 1) + " < "
-//                    + fpResult.finalWidth + " || "
-//                    + (cachedBitmap.getHeight() + 1) + " < "
-//                    + fpResult.finalHeight);
-            if ((cachedBitmap.getWidth() + 1) < fpResult.finalWidth
-                    || (cachedBitmap.getHeight() + 1) < fpResult.finalHeight) {
-                // invalidate the existing entry
-//                Log.d(LOG_TAG, cacheKey + " is not big enough !");
-                overWriteCache = true;
-                cachedBitmap = null;
-            }
-
-        }
-
-        result = secondPass(context, input, fpResult, Bitmap.Config.RGB_565,
-                cachedBitmap);
-
-        // Store the result in cache
-        if (result != null && overWriteCache) {
-            bmpCache.put(cacheKey, result);
-        }
-        return result;
-    }
 
     /**
      * Create the new Bitmap fitting in the requested size.

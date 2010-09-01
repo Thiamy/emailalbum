@@ -36,7 +36,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-import org.acra.CrashReportingApplication;
 import org.acra.ErrorReporter;
 
 import android.app.Activity;
@@ -51,6 +50,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Bitmap.Config;
@@ -58,7 +58,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Looper;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.text.format.DateFormat;
@@ -66,8 +65,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -745,6 +744,8 @@ public class EmailAlbumEditor extends ListActivity implements
 
         @Override
         protected void onPostExecute(Uri result) {
+            // Re-enable orientation changes
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
             // Album generation done, close the progress dialog
             try {
                 dismissDialog(DIALOG_PROGRESS_EXPORT);
@@ -777,6 +778,8 @@ public class EmailAlbumEditor extends ListActivity implements
          */
         @Override
         protected void onPreExecute() {
+            // Disable orientation changes during this possibly long process.
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
             // Before exporting, show the progress dialog
             showDialog(DIALOG_PROGRESS_EXPORT);
             super.onPreExecute();
