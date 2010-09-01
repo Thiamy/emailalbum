@@ -35,6 +35,7 @@ import java.util.zip.ZipFile;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -44,6 +45,7 @@ import android.view.WindowManager;
 
 import com.kg.emailalbum.mobile.util.BitmapLoader;
 import com.kg.emailalbum.mobile.util.CacheManager;
+import com.kg.oifilemanager.filemanager.FileManagerProvider;
 
 /**
  * Creates Thumbnails from pictures contained in a zip archive.
@@ -127,7 +129,8 @@ public class ThumbnailsCreator extends Thread {
                     thumbFile = new File(mCacheDir, thumbName);
                     // Create the file only if it doesn't already exist
                     if (!files.contains(thumbName)) {
-                        thumb = BitmapLoader.load(mContext, mArchive, entry,
+                        Uri imgUri = FileManagerProvider.getContentUri(mArchive.getName(), entry.getName());
+                        thumb = BitmapLoader.load(mContext, imgUri,
                                 mThumbWidth, null);
 
                         if (thumb != null) {
@@ -137,7 +140,7 @@ public class ThumbnailsCreator extends Thread {
 
                             thumbOS.flush();
                             thumbOS.close();
-                            thumb.recycle();
+                            //thumb.recycle();
                         } else {
                             sendError(new IOException(
                                     "This archive is corrupt or contains bad character encoding."));
