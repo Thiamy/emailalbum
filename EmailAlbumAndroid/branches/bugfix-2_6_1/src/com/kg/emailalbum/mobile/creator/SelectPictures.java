@@ -51,6 +51,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
@@ -79,22 +81,47 @@ import com.kg.emailalbum.mobile.util.BitmapLoader;
  * @author Kevin Gaudin
  */
 public class SelectPictures extends Activity {
-    
+
     public static Bitmap ROBOT;
+    public static Bitmap ROBOT_ERROR;
+
+    private class ScrollManager implements OnScrollListener {
+        private int mPreviousState = SCROLL_STATE_IDLE;
+
+        @Override
+        public void onScroll(AbsListView arg0, int arg1, int arg2, int arg3) {
+            // TODO Auto-generated method stub
+
+        }
+
+        @Override
+        public void onScrollStateChanged(AbsListView view, int scrollState) {
+            if (mPreviousState != SCROLL_STATE_FLING && scrollState == SCROLL_STATE_FLING) {
+//                Log.d(LOG_TAG, "Fling detected ! Stop fetchingThumbnails !");
+                mImageAdapter.stopFetchingThumbnails();
+            } else if (mPreviousState == SCROLL_STATE_FLING && scrollState != SCROLL_STATE_FLING) {
+//                Log.d(LOG_TAG, "Fling stoped ! Add currently viewed items !");
+                final int count = view.getChildCount();
+                for (int i = 0; i < count; i++) {
+                    mImageAdapter.startFetchingThumbnails(view.getChildAt(i));
+                }
+            }
+            mPreviousState = scrollState;
+        }
+
+    }
 
     /**
      * A specific adapter for this list based activity.
      */
     public static class MultiSelectImageAdapter extends BaseAdapter {
+        private boolean isFetchingThumbnailsAllowed = true;
+
         /**
          * Asynchronous process for retrieving thumbnails from Uris.
          */
-        private class ThumbnailGetter extends AsyncTask<Uri, Integer, Uri> {
-            private final String LOG_TAG = ThumbnailGetter.class
-                    .getSimpleName();
-
-            /** The Uri beeing processed */
-            private Uri mUri = null;
+        private class ThumbnailGetter extends AsyncTask<Void, Uri, Void> {
+            private final String LOG_TAG = ThumbnailGetter.class.getSimpleName();
 
             /*
              * (non-Javadoc)
@@ -102,13 +129,27 @@ public class SelectPictures extends Activity {
              * @see android.os.AsyncTask#doInBackground(Params[])
              */
             @Override
-            protected Uri doInBackground(Uri... uris) {
-                // We process Uris one after another... so the Array contains
-                // only one Uri.
-                mUri = uris[0];
-                // Let the ThumbnailLoader do the job.
-                Uri result = ItemsLoader.getThumbnail(mContext, mUri);
-                return result;
+            protected Void doInBackground(Void... nothing) {
+                while (!mPendingThumbnailRequests.isEmpty()) {
+                    Uri srcUri = mPendingThumbnailRequests.poll();
+//                    Log.d(LOG_TAG, "Consumed " + srcUri + " from the queue ! " + mPendingThumbnailRequests.size());
+                    // Let the ThumbnailLoader do the job.
+                    Uri result = ItemsLoader.getThumbnail(mContext, srcUri);
+                    publishProgress(srcUri, result);
+                }
+                return null;
+            }
+
+            /*
+             * (non-Javadoc)
+             * 
+             * @see android.os.AsyncTask#onProgressUpdate(Progress[])
+             */
+            @Override
+            protected void onProgressUpdate(Uri... loadedPictures) {
+                super.onProgressUpdate(loadedPictures);
+                // Give the retrieved thumbnail to the adapter...
+                mImageAdapter.updateThumbUri(loadedPictures[0], loadedPictures[1]);
             }
 
             /*
@@ -117,15 +158,13 @@ public class SelectPictures extends Activity {
              * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
              */
             @Override
-            protected void onPostExecute(Uri result) {
-                super.onPostExecute(result);
-                // Give the retrieved thumbnail to the adapter...
-                mImageAdapter.updateThumbUri(mUri, result);
-                // then process any other pending thumbnail request.
+            protected void onPostExecute(Void nothing) {
+                super.onPostExecute(nothing);
+                // Process any other pending thumbnail request.
                 if (!mPendingThumbnailRequests.isEmpty()) {
+//                    Log.d(LOG_TAG, "Create a new ThumbnailGetter in it's own onPostExecute() :(");
                     mThmGetter = new ThumbnailGetter();
-                    mThmGetter.execute(mPendingThumbnailRequests.poll());
-
+                    mThmGetter.execute();
                 }
 
             }
@@ -140,8 +179,7 @@ public class SelectPictures extends Activity {
             CheckBox imageCheck = null;
         }
 
-        private final String LOG_TAG = MultiSelectImageAdapter.class
-                .getSimpleName();
+        private final String LOG_TAG = MultiSelectImageAdapter.class.getSimpleName();
 
         /** This adapter needs a reference to a context. */
         private Context mContext = null;
@@ -163,8 +201,7 @@ public class SelectPictures extends Activity {
         private OnCheckedChangeListener mOnImageCheckedListener = new OnCheckedChangeListener() {
 
             @Override
-            public void onCheckedChanged(CompoundButton buttonView,
-                    boolean isChecked) {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 // We stored the image Uri in the CheckBox tag
                 Uri imageUri = (Uri) buttonView.getTag();
                 setItemSelected(imageUri, isChecked);
@@ -175,7 +212,7 @@ public class SelectPictures extends Activity {
         /** Contains all the pending requests for thumbnails. */
         private LinkedList<Uri> mPendingThumbnailRequests = new LinkedList<Uri>();
         /** Stores Uris selected by the user */
-        private Set<Uri> mSelectedUris = new LinkedHashSet<Uri>(20);
+        private Set<Uri> mSelectedUris = new LinkedHashSet<Uri>();
 
         private ThumbnailGetter mThmGetter = null;
 
@@ -216,6 +253,22 @@ public class SelectPictures extends Activity {
         public MultiSelectImageAdapter(Context context, Handler handler) {
             mContext = context;
             mHandler = handler;
+        }
+
+        public void startFetchingThumbnails(View item) {
+            isFetchingThumbnailsAllowed = true;
+            ViewHolder vh = (ViewHolder) item.getTag();
+            Uri imageUri = (Uri) vh.checkableImage.getTag();
+            if (!mThumbsUris.containsKey(imageUri)) {
+                mPendingThumbnailRequests.offer(imageUri);
+                startThumbnailsGetter();
+            }
+        }
+
+        public void stopFetchingThumbnails() {
+            isFetchingThumbnailsAllowed = false;
+            mPendingThumbnailRequests.clear();
+//            Log.d(LOG_TAG, "Cleared pending requests !");
         }
 
         /**
@@ -287,7 +340,7 @@ public class SelectPictures extends Activity {
          */
         @Override
         public Object getItem(int position) {
-            if(mImagesUris.size() > 0) {
+            if (mImagesUris.size() > 0) {
                 return mImagesUris.get(position);
             } else {
                 return null;
@@ -302,8 +355,7 @@ public class SelectPictures extends Activity {
         @Override
         public long getItemId(int position) {
             if (mImagesUris.size() > 0) {
-                return Long.parseLong(mImagesUris.get(position)
-                        .getLastPathSegment());
+                return Long.parseLong(mImagesUris.get(position).getLastPathSegment());
             } else {
                 return 0;
             }
@@ -319,40 +371,30 @@ public class SelectPictures extends Activity {
         public View getView(int position, View convertView, ViewGroup parent) {
             ViewHolder vh = null;
             View resultView;
+            Uri imageUri = mImagesUris.get(position);
+
             if (convertView == null) {
                 // No view to recycle, create a new one
-                resultView = ((LayoutInflater) mContext
-                        .getSystemService(Context.LAYOUT_INFLATER_SERVICE))
-                        .inflate(R.layout.selectable_image, null);
+                resultView = ((LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(
+                        R.layout.selectable_image, null);
 
                 // Initialize the ViewHolder with this view's references
                 // to frequently used UI components
                 vh = new ViewHolder();
 
-                vh.checkableImage = (ImageView) resultView
-                        .findViewById(R.id.CheckableImage);
+                vh.checkableImage = (ImageView) resultView.findViewById(R.id.CheckableImage);
                 vh.checkableImage.setOnClickListener(mThumbnailClickListener);
 
-                vh.imageCheck = (CheckBox) resultView
-                        .findViewById(R.id.ImageCheck);
+                vh.imageCheck = (CheckBox) resultView.findViewById(R.id.ImageCheck);
 
-                vh.imageCheck
-                        .setOnCheckedChangeListener(mOnImageCheckedListener);
+                vh.imageCheck.setOnCheckedChangeListener(mOnImageCheckedListener);
                 resultView.setTag(vh);
             } else {
                 // We reuse a previously generated View
                 resultView = convertView;
                 vh = (ViewHolder) resultView.getTag();
-                // Get rid of a possible pending thumbnail request
-                // This cancels any request for a thumbnail which is now
-                // out of the visible Views.
-                if (vh.checkableImage.getTag() != null) {
-                    mPendingThumbnailRequests
-                            .remove(vh.checkableImage.getTag());
-                }
             }
 
-            Uri imageUri = mImagesUris.get(position);
             // Add a way to identify the logical item to which sub-views are
             // linked. That way, we can handle a specific click on each sub-view
             // and not only a click on the whole item.
@@ -363,29 +405,22 @@ public class SelectPictures extends Activity {
             Uri thumbUri = mThumbsUris.get(imageUri);
             if (thumbUri != null) {
                 try {
-                    Bitmap thumb = BitmapLoader.load(mContext, thumbUri, null,
-                            null);
-                    if(thumb == null) {
-                        thumb = ROBOT;
+                    Bitmap thumb = BitmapLoader.load(mContext, thumbUri, null, null);
+                    if (thumb == null) {
+                        thumb = ROBOT_ERROR;
                     }
                     vh.checkableImage.setImageBitmap(thumb);
                 } catch (IOException e) {
                     Log.e(LOG_TAG, "Error : ", e);
                 }
             } else {
-                // If not in cache, add this image uri to the list of
-                // thumbnails to retrieve and display a replacement picture
-                vh.checkableImage.setImageResource(R.drawable.robot);
-                if (!mPendingThumbnailRequests.contains(imageUri)) {
-                    mPendingThumbnailRequests.offer(imageUri);
-                    if (mThmGetter == null
-                            || mThmGetter.getStatus() == AsyncTask.Status.FINISHED) {
-                        // If the previous instance of the thumbnail getter has
-                        // finished, start a new one.
-                        mHandler.sendEmptyMessage(MSG_SHOW_INDETERMINATE_PROGRESS);
-                        mThmGetter = new ThumbnailGetter();
-                        mThmGetter.execute(mPendingThumbnailRequests.poll());
+                vh.checkableImage.setImageBitmap(ROBOT);
+                if (isFetchingThumbnailsAllowed && !mPendingThumbnailRequests.contains(imageUri)) {
+                    if (!mPendingThumbnailRequests.offer(imageUri)) {
+                        Log.d(LOG_TAG,
+                                "Could not insert " + imageUri + " in the queue ! " + mPendingThumbnailRequests.size());
                     }
+                    startThumbnailsGetter();
                 }
             }
 
@@ -393,6 +428,21 @@ public class SelectPictures extends Activity {
             vh.imageCheck.setChecked(isItemSelected(position));
 
             return resultView;
+        }
+
+        /**
+         * 
+         */
+        private void startThumbnailsGetter() {
+            if (isFetchingThumbnailsAllowed
+                    && (mThmGetter == null || mThmGetter.getStatus() == AsyncTask.Status.FINISHED)) {
+                // If the previous instance of the thumbnail getter has
+                // finished, start a new one.
+                mHandler.sendEmptyMessage(MSG_SHOW_INDETERMINATE_PROGRESS);
+//                Log.d(LOG_TAG, "Create a new ThumbnailGetter from getView()");
+                mThmGetter = new ThumbnailGetter();
+                mThmGetter.execute();
+            }
         }
 
         /**
@@ -571,8 +621,7 @@ public class SelectPictures extends Activity {
         // Query the MediaStore for a list of pictures buckets.
         ContentResolver cr = getContentResolver();
         String[] projection = { MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME };
-        Cursor cursor = MediaStore.Images.Media.query(cr,
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection);
+        Cursor cursor = MediaStore.Images.Media.query(cr, MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection);
 
         if (cursor != null) {
             cursor.moveToFirst();
@@ -585,55 +634,47 @@ public class SelectPictures extends Activity {
         Log.d(getClass().getSimpleName(), "Buckets : " + mBuckets.toString());
 
         if (mBuckets.size() == 0) {
-            Toast.makeText(getApplicationContext(), R.string.no_files_error,
-                    Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), R.string.no_files_error, Toast.LENGTH_LONG).show();
             this.finish();
         }
         // Prepare the adapter for the spinner
         String[] values = new String[mBuckets.size()];
         values = mBuckets.toArray(values);
-        ArrayAdapter<String> bucketsAdapter = new ArrayAdapter<String>(
-                getApplicationContext(), android.R.layout.simple_spinner_item,
-                values);
-        bucketsAdapter
-                .setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        ArrayAdapter<String> bucketsAdapter = new ArrayAdapter<String>(getApplicationContext(),
+                android.R.layout.simple_spinner_item, values);
+        bucketsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mSpinBuckets.setAdapter(bucketsAdapter);
 
         // Handle spinner value change
-        mSpinBuckets
-                .setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        mSpinBuckets.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
-                    @Override
-                    public void onItemSelected(AdapterView<?> arg0, View arg1,
-                            int pos, long arg3) {
-                        if (!keepOldContent) {
-                            // User changed images bucket
-                            Log.d(getClass().getSimpleName(),
-                                    "Selected item : "
-                                            + mBuckets.toArray()[pos]);
-                            mImageAdapter.empty();
-                            if (mItemsLoader != null) {
-                                mItemsLoader.stopJob();
-                                mItemsLoader.removeLock();
-                            }
-                            mItemsLoader = new ItemsLoader(
-                                    getApplicationContext(), mItemsHandler,
-                                    (String) (mBuckets.toArray()[pos]));
-                            mItemsLoader.start();
-                        } else {
-                            // User did not change bucket, this is the result
-                            // of an orientation change. Set back the flag to
-                            // false.
-                            keepOldContent = false;
-                        }
+            @Override
+            public void onItemSelected(AdapterView<?> arg0, View arg1, int pos, long arg3) {
+                if (!keepOldContent) {
+                    // User changed images bucket
+                    Log.d(getClass().getSimpleName(), "Selected item : " + mBuckets.toArray()[pos]);
+                    mImageAdapter.empty();
+                    if (mItemsLoader != null) {
+                        mItemsLoader.stopJob();
+                        mItemsLoader.removeLock();
                     }
+                    mItemsLoader = new ItemsLoader(getApplicationContext(), mItemsHandler,
+                            (String) (mBuckets.toArray()[pos]));
+                    mItemsLoader.start();
+                } else {
+                    // User did not change bucket, this is the result
+                    // of an orientation change. Set back the flag to
+                    // false.
+                    keepOldContent = false;
+                }
+            }
 
-                    @Override
-                    public void onNothingSelected(AdapterView<?> arg0) {
-                        // DO NOTHING
-                    }
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+                // DO NOTHING
+            }
 
-                });
+        });
 
         if (currentBucket >= 0) {
             // If an orientation changed occured, we return to the
@@ -650,7 +691,8 @@ public class SelectPictures extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ROBOT = BitmapFactory.decodeResource(SelectPictures.this.getResources(), R.drawable.robot_error);
+        ROBOT_ERROR = BitmapFactory.decodeResource(SelectPictures.this.getResources(), R.drawable.robot_error);
+        ROBOT = BitmapFactory.decodeResource(SelectPictures.this.getResources(), R.drawable.robot);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setTitle(R.string.btn_pick_pictures);
         setResult(RESULT_CANCELED);
@@ -703,11 +745,11 @@ public class SelectPictures extends Activity {
         } else {
             initBuckets(-1);
             // or create a new one
-            mImageAdapter = new MultiSelectImageAdapter(
-                    getApplicationContext(), dialogHandler);
+            mImageAdapter = new MultiSelectImageAdapter(getApplicationContext(), dialogHandler);
         }
 
         mGrid.setAdapter(mImageAdapter);
+        mGrid.setOnScrollListener(new ScrollManager());
 
         // Init of the "Done" button
         Button btnSelectionDone = (Button) findViewById(R.id.btn_selection_done);
@@ -734,17 +776,14 @@ public class SelectPictures extends Activity {
         switch (id) {
         case DIALOG_IMAGE_PREVIEW:
             // Create the dialog for previewing pictures
-            ImageView imgPrv = (ImageView) getLayoutInflater().inflate(
-                    R.layout.image_preview, null);
+            ImageView imgPrv = (ImageView) getLayoutInflater().inflate(R.layout.image_preview, null);
             return new AlertDialog.Builder(this).setView(imgPrv).create();
         case DIALOG_WAIT_PREVIEW:
             // Create the progress dialog to be displayed while loading
             // the picture being previewd
             dialog = new ProgressDialog(this);
-            ((ProgressDialog) dialog)
-                    .setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            ((ProgressDialog) dialog)
-                    .setMessage(getText(R.string.preparing_preview));
+            ((ProgressDialog) dialog).setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            ((ProgressDialog) dialog).setMessage(getText(R.string.preparing_preview));
             ((ProgressDialog) dialog).setCancelable(false);
             return dialog;
         default:
@@ -789,8 +828,7 @@ public class SelectPictures extends Activity {
         super.onPrepareDialog(id, dialog);
         switch (id) {
         case DIALOG_IMAGE_PREVIEW:
-            ImageView imgPrv = (ImageView) dialog
-                    .findViewById(R.id.image_preview);
+            ImageView imgPrv = (ImageView) dialog.findViewById(R.id.image_preview);
             imgPrv.setOnClickListener(new OnClickListener() {
 
                 @Override
@@ -892,8 +930,7 @@ public class SelectPictures extends Activity {
             @Override
             protected Bitmap doInBackground(Uri... uris) {
                 try {
-                    return BitmapLoader.load(getApplicationContext(), uris[0],
-                            null, null);
+                    return BitmapLoader.load(getApplicationContext(), uris[0], null, null);
                 } catch (IOException e) {
                     Log.e(LOG_TAG, "Error : ", e);
                 }
@@ -909,7 +946,7 @@ public class SelectPictures extends Activity {
             protected void onPostExecute(Bitmap result) {
                 mPreviewPic = result;
                 removeDialog(DIALOG_WAIT_PREVIEW);
-                if(mPreviewPic != null) {
+                if (mPreviewPic != null) {
                     showDialog(DIALOG_IMAGE_PREVIEW);
                 }
             }
