@@ -242,7 +242,7 @@ public class BitmapLoader {
             colorConfig = Bitmap.Config.RGB_565;
         }
 
-        Log.d(LOG_TAG, "Open Uri" + uri.toString());
+//        Log.d(LOG_TAG, "Open Uri" + uri.toString());
         InputStream input = CustomContentResolver.openInputStream(context, uri);
 
         if (input == null)

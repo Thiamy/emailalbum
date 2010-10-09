@@ -27,7 +27,7 @@ public class CustomContentResolver {
             throws FileNotFoundException {
         String ext = FileUtils.getExtension(uri.getLastPathSegment());
         String entry = uri.getFragment();
-        Log.d(LOG_TAG, "ext=" + ext + " entry=" + entry);
+//        Log.d(LOG_TAG, "ext=" + ext + " entry=" + entry);
         if (entry != null
                 && (ext.equalsIgnoreCase(".jar")
                         || ext.equalsIgnoreCase(".zip") || ext

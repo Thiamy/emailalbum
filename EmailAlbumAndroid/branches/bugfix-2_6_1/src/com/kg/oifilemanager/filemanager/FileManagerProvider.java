@@ -98,8 +98,8 @@ public class FileManagerProvider extends ContentProvider {
             if (mode.equalsIgnoreCase("rw"))
                 m = ParcelFileDescriptor.MODE_READ_WRITE;
 
-            Log.d(LOG_TAG, "Trying to open file : " + uri.toString().substring(
-                    CONTENT_URI_STRING.length()));
+//            Log.d(LOG_TAG, "Trying to open file : " + uri.toString().substring(
+//                    CONTENT_URI_STRING.length()));
             File f = new File(uri.toString().substring(
                     CONTENT_URI_STRING.length()));
             try {
