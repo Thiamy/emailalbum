@@ -25,6 +25,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -131,8 +132,14 @@ public class SelectPictures extends Activity {
             @Override
             protected Void doInBackground(Void... nothing) {
                 while (!mPendingThumbnailRequests.isEmpty()) {
-                    Uri srcUri = mPendingThumbnailRequests.poll();
-//                    Log.d(LOG_TAG, "Consumed " + srcUri + " from the queue ! " + mPendingThumbnailRequests.size());
+                    Uri srcUri =null;
+                    try {
+                        srcUri = mPendingThumbnailRequests.poll();
+                    } catch (NoSuchElementException e) {
+                        Log.w(LOG_TAG, "mPendingThumbnailRequests wasn't empty but it is now !");
+                        break;
+                    }
+//                  Log.d(LOG_TAG, "Consumed " + srcUri + " from the queue ! " + mPendingThumbnailRequests.size());
                     // Let the ThumbnailLoader do the job.
                     Uri result = ItemsLoader.getThumbnail(mContext, srcUri);
                     publishProgress(srcUri, result);

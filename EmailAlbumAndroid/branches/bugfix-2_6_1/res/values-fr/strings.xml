@@ -90,6 +90,8 @@
   Rapports d\'erreur gérés avec ACRA : http://acra.googlecode.com\n
 	</string>
  <string name="changelog">
+  Corrigé en version 2.9.3:\n
+  - Devrait éviter quelques plantages pendant le défilement des minitures lors de la sélection de photos.\n
   Corrigé en version 2.9.2:\n
   - Réécriture du système de récupération des miniatures d\'images lors de la sélection de photos à ajouter à un album. Meilleure gestion de la mémoire de l\'utilisation du processeur.\n
   Corrigé en version 2.9.1:\n

@@ -88,8 +88,10 @@
   ACRA : http://acra.googlecode.com\n
 	</string>
  <string name="changelog">
+  Fixed in version 2.9.3:\n
+  - Should fix some crashes while scrolling through pictures selection screen.\n 
   Fixed in version 2.9.2:\n
-  - Rwrote the thumbnails generation engine in the picture selection screen when adding pics to an album. Better memory and CPU management.\n 
+  - Rewrote the thumbnails generation engine in the picture selection screen when adding pics to an album. Better memory and CPU management.\n 
   Fixed in version 2.9.1:\n
   - Lots of memory management / caching issues tweaked... this might fix a lot of album creation / viewing crashes you might have encountered with the 2.9.0 release.\n
   - Prevent screen orientation change while exporting/sending album. This could lead to unstable application state.\n 

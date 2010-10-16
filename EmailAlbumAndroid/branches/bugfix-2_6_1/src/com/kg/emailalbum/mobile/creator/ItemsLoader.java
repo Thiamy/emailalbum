@@ -6,6 +6,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import org.acra.ErrorReporter;
+
 import android.content.Context;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
@@ -65,7 +67,7 @@ public class ItemsLoader extends Thread {
      */
     public static Uri getThumbnail(Context context, Uri imageUri) {
         Uri result = null;
-        if (context != null) {
+        if (context != null && imageUri != null) {
             File storageDir = new CacheManager(context).getCacheDir("creator");
 
             try {
@@ -105,7 +107,8 @@ public class ItemsLoader extends Thread {
                 Log.e(LOG_TAG, "Error : ", e);
             }
         } else {
-            Log.e(LOG_TAG, "Context is null !");
+            ErrorReporter.getInstance().addCustomData("imageUri" , imageUri == null ? "null" : imageUri.toString());
+            Log.e(LOG_TAG, "Context or imageUri are null !");
         }
         return result;
     }
