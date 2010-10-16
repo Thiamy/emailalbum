@@ -357,6 +357,9 @@ public class EmailAlbumEditor extends ListActivity implements OnSharedPreference
         }
 
         public void changeItemUri(AlbumItem selectedItem, Uri newUri) {
+            if(newUri.toString().contains(".cache/temp")) {
+                ErrorReporter.getInstance().handleSilentException(new Exception("Asked to change an AlbumItem from " + selectedItem.uri.toString() + " to a .cache/temp picture " + newUri.toString() + " !"));
+            }
             selectedItem.uri = newUri;
             selectedItem.thumbUri = ItemsLoader.getThumbnail(getApplicationContext(), newUri);
             notifyDataSetChanged();
@@ -433,6 +436,9 @@ public class EmailAlbumEditor extends ListActivity implements OnSharedPreference
          *            The generated Thumbnail.
          */
         public AlbumItem(Uri uri, String caption, Uri thumbUri) {
+            if(uri.toString().contains(".cache/temp")) {
+                ErrorReporter.getInstance().handleSilentException(new Exception("Asked to create a new AlbumItem from a .cache/temp picture" + uri.toString() + " !"));
+            }
             this.uri = uri;
             this.caption = caption != null ? caption : "";
             this.thumbUri = thumbUri;
