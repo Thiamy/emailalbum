@@ -176,7 +176,8 @@
  <string name="exporting">Creating album...</string>
  <string name="preparing_preview">Preparing preview...</string>
  <string name="send_as_emailalbum">Send as an EmailAlbum</string>
-
+ <string name="error_select_activity">Please choose an application other than EmailAlbum (GMail, SMS...)</string>
+ <string name="error_no_send_activity">You don\'t have any application capable of sending this kind of album.</string>
 
  <!-- OI File Manager strings -->
  <!-- *************************** About information *************************** -->
