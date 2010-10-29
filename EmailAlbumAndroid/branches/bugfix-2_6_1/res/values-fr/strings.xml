@@ -179,6 +179,9 @@
  <string name="send_album_with">Envoyer l\'album avec...</string>
  <string name="exporting">Création de l\'album...</string>
  <string name="preparing_preview">Chargement...</string>
+ <string name="send_as_emailalbum">Envoyer en EmailAlbum</string>
+ <string name="error_select_activity">Merci de choisr une application autre que EmailAlbum (GMail, SMS...)</string>
+ <string name="error_no_send_activity">Vous ne disposez d\'aucune application permettant d\'envoyer ce type d\'album.</string>
 
 
  <!-- OI File Manager strings -->

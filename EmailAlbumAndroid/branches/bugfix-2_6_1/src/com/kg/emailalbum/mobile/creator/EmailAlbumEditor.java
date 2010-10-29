@@ -79,6 +79,7 @@ import android.widget.Toast;
 
 import com.kg.emailalbum.mobile.EmailAlbumPreferences;
 import com.kg.emailalbum.mobile.R;
+import com.kg.emailalbum.mobile.ui.QuickAction;
 import com.kg.emailalbum.mobile.util.BitmapLoader;
 import com.kg.emailalbum.mobile.util.BitmapUtil;
 import com.kg.emailalbum.mobile.util.CacheManager;
@@ -741,7 +742,7 @@ public class EmailAlbumEditor extends ListActivity implements OnSharedPreference
                     // TODO Auto-generated catch block
                     Log.e(LOG_TAG, "Error : ", e);
                 }
-                IntentHelper.sendAllPicturesInFolder(EmailAlbumEditor.this, new File(result.getPath()), mAlbumName,
+                IntentHelper.sendAllPicturesInFolder(findViewById(R.id.btn_album_share), new File(result.getPath()), mAlbumName,
                         bodyWriter.toString());
 
             }
@@ -799,6 +800,7 @@ public class EmailAlbumEditor extends ListActivity implements OnSharedPreference
 
     // Menu items
     private static final int MENU_PREFS_ID = 0;
+    public static final String EXTRA_EMAILALBUM_INTENT = "EMAILALBUM_INTENT";
 
     /** A reference to the list adapter */
     private AlbumAdapter mAdapter;
@@ -1034,6 +1036,10 @@ public class EmailAlbumEditor extends ListActivity implements OnSharedPreference
                 mAdapter.addUri(toSend);
 
             } else if (actionSendMultiple != null && i.getAction().equals(actionSendMultiple)) {
+                if(i.getBooleanExtra(EXTRA_EMAILALBUM_INTENT, false)) {
+                    Toast.makeText(getApplicationContext(), R.string.error_select_activity, Toast.LENGTH_LONG).show();
+                    finish();
+                }
                 ArrayList<Uri> toSend = i.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
                 Log.d(LOG_TAG, "Uri to send : " + toSend);
                 mAdapter.addAllUris(toSend);
@@ -1326,8 +1332,16 @@ public class EmailAlbumEditor extends ListActivity implements OnSharedPreference
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("application/zip");
         intent.putExtra(Intent.EXTRA_STREAM, album);
+
+        QuickAction qa = QuickAction.buildChooser(findViewById(R.id.btn_album_share), intent, true);
+        if(qa != null) {
+            qa.show();
+        } else {
+            Toast.makeText(this, R.string.error_no_send_activity, Toast.LENGTH_LONG).show();
+        }
+        
         // intent.putExtra(Intent.EXTRA_SUBJECT, "album.jar");
-        startActivity(Intent.createChooser(intent, getText(R.string.send_album_with)));
+//        startActivity(Intent.createChooser(intent, getText(R.string.send_album_with)));
     }
 
     /**

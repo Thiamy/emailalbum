@@ -78,7 +78,7 @@
 
 
   <activity android:name="com.kg.emailalbum.mobile.EmailAlbumPreferences"></activity>
-
+  <activity android:name="com.kg.emailalbum.mobile.util.ActivityPickerActivity" android:theme="@android:style/Theme.Dialog" />
   <provider android:name="com.kg.oifilemanager.filemanager.FileManagerProvider" android:authorities="com.kg.emailalbum.share"></provider>
  </application>
  <supports-screens android:normalScreens="true" android:anyDensity="true" android:resizeable="true"
