@@ -90,27 +90,8 @@
   Rapports d\'erreur gérés avec ACRA : http://acra.googlecode.com\n
 	</string>
  <string name="changelog">
-  Corrigé en version 2.9.3:\n
-  - Devrait éviter quelques plantages pendant le défilement des minitures lors de la sélection de photos.\n
-  Corrigé en version 2.9.2:\n
-  - Réécriture du système de récupération des miniatures d\'images lors de la sélection de photos à ajouter à un album. Meilleure gestion de la mémoire de l\'utilisation du processeur.\n
-  Corrigé en version 2.9.1:\n
-  - Beaucoup d\'ajustements sur la gestion de la mémoire, devrait résoudre
-  un grand nombre de problèmes rencontrés à la création et à la visualisation d\'album dans la version 2.9.0.\n
-  - La rotation d\'écran n\'est plus appliquée pendant le process de génération d\'album. Cela entrainait des états instables
-  de l\'application.\n
-  Nouveautés version 2.9.0 :\n
-  - les albums peuvent maintenant être générés en résolution 1024x768 \n
-  - compatibilité avec
-  l\'application Yahoo Mail pour Android\n
-  - compatibility avec l\'application GMail application pour
-  les téléphones
-  Verizon Droid 2.2\n
-  Corrigé en version 2.9.0 :\n
-  - Problème de stabilité des miniatures lors de la
-  sélection des images\n
-  - Certains rencontrent
-  des problèmes lors de la création d\'album... peut-être réglés...\n
+  Nouveautés version 2.10.0:\n
+  - Lors de l\'envoi de l\'album, le choix de l\'application se fait désormais via une bulle \'QuickAction\'. C\'est plus joli et cela permet d\'éviter de laisser la possibilité de sélectionner EmailAlbum comme application d\'envoi, ce qui était la raison de la plupart des erreurs applicatives rencontrées.\n 
  </string>
  <string name="url_donate">
   https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=DT9H5GSCL9U76&amp;lc=FR&amp;item_name=EmailAlbum%20Viewer&amp;currency_code=EUR&amp;bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHosted

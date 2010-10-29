@@ -88,20 +88,8 @@
   ACRA : http://acra.googlecode.com\n
 	</string>
  <string name="changelog">
-  Fixed in version 2.9.3:\n
-  - Should fix some crashes while scrolling through pictures selection screen.\n 
-  Fixed in version 2.9.2:\n
-  - Rewrote the thumbnails generation engine in the picture selection screen when adding pics to an album. Better memory and CPU management.\n 
-  Fixed in version 2.9.1:\n
-  - Lots of memory management / caching issues tweaked... this might fix a lot of album creation / viewing crashes you might have encountered with the 2.9.0 release.\n
-  - Prevent screen orientation change while exporting/sending album. This could lead to unstable application state.\n 
-  New in version 2.9.0:\n
-  - 1024x768 mode for album creation\n
-  - compatibility with attachments from Yahoo Mail android application\n
-  - compatibility with GMail application for Verizon Droid 2.2\n 
-  Fixed in version 2.9.0:\n
-  - Picture selection thumbnails stability issue\n
-  - Album creation errors on some devices ? (at least hope so...)\n
+  New in version 2.10.0:\n
+  - When sending album, the choice of the sender application is offered through a QuickAction bubble. This looks nicer and allowed to remove EmailAlbum from the possible sender which was a bad choice and caused most of the reported application crashes.\n 
  </string>
  <string name="url_donate">https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=DT9H5GSCL9U76&amp;lc=EN&amp;item_name=EmailAlbum%20Viewer&amp;currency_code=EUR&amp;bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHosted
  </string>
