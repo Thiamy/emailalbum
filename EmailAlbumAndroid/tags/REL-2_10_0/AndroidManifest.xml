@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.kg.emailalbum.mobile"
+ android:installLocation="auto" android:versionName="2.10.0" android:versionCode="43">
+ <uses-sdk android:minSdkVersion="3" android:targetSdkVersion="8" />
+
+ <application android:icon="@drawable/icon" android:label="@string/app_name" android:name="EmailAlbumApplication">
+
+  <activity android:name="org.acra.CrashReportDialog" android:theme="@android:style/Theme.Dialog"
+   android:launchMode="singleInstance" />
+
+  <activity android:name="com.kg.emailalbum.mobile.viewer.EmailAlbumViewer" android:label="@string/app_name">
+   <intent-filter android:icon="@drawable/icon" android:label="EmailAlbumViewer">
+    <action android:name="android.intent.action.VIEW" />
+    <category android:name="android.intent.category.DEFAULT" />
+    <category android:name="android.intent.category.BROWSABLE"></category>
+    <category android:name="android.intent.category.ALTERNATIVE" />
+    <category android:name="android.intent.category.SELECTED_ALTERNATIVE" />
+    <data android:mimeType="application/java-archive" />
+    <data android:mimeType="application/x-java-archive" />
+    <data android:mimeType="application/x-jar" />
+    <data android:mimeType="application/zip" />
+   </intent-filter>
+   <intent-filter android:icon="@drawable/icon" android:label="@string/open_comic_archive">
+    <action android:name="android.intent.action.VIEW" />
+    <category android:name="android.intent.category.DEFAULT" />
+    <category android:name="android.intent.category.BROWSABLE"></category>
+    <category android:name="android.intent.category.ALTERNATIVE" />
+    <category android:name="android.intent.category.SELECTED_ALTERNATIVE" />
+    <data android:mimeType="application/x-cbz" />
+   </intent-filter>
+  </activity>
+  <activity android:name="com.kg.emailalbum.mobile.viewer.ShowPics" />
+
+  <activity android:name=".AboutDialog" android:theme="@android:style/Theme.Dialog" />
+
+  <activity android:name="com.kg.oifilemanager.filemanager.FileManagerActivity" android:label="@string/app_name">
+   <intent-filter>
+    <action android:name="com.kg.oifilemanager.action.PICK_FILE" />
+    <category android:name="android.intent.category.DEFAULT" />
+    <data android:scheme="file" />
+   </intent-filter>
+   <intent-filter>
+    <action android:name="com.kg.oifilemanager.action.PICK_FILE" />
+    <category android:name="android.intent.category.DEFAULT" />
+   </intent-filter>
+   <intent-filter>
+    <action android:name="com.kg.oifilemanager.action.PICK_DIRECTORY" />
+    <category android:name="android.intent.category.DEFAULT" />
+    <data android:scheme="file" />
+   </intent-filter>
+   <intent-filter>
+    <action android:name="com.kg.oifilemanager.action.PICK_DIRECTORY" />
+    <category android:name="android.intent.category.DEFAULT" />
+   </intent-filter>
+  </activity>
+
+  <!-- Creator Activities -->
+  <activity android:name="com.kg.emailalbum.mobile.creator.SelectPictures">
+  </activity>
+  <activity android:name="com.kg.emailalbum.mobile.creator.EmailAlbumEditor">
+   <intent-filter android:icon="@drawable/icon" android:label="@string/send_as_emailalbum">
+    <action android:name="android.intent.action.SEND" />
+    <action android:name="android.intent.action.SEND_MULTIPLE" />
+    <category android:name="android.intent.category.DEFAULT" />
+    <category android:name="android.intent.category.ALTERNATIVE" />
+    <category android:name="android.intent.category.SELECTED_ALTERNATIVE" />
+    <data android:mimeType="image/*" />
+   </intent-filter>
+  </activity>
+
+  <activity android:name=".EmailAlbum" android:label="@string/app_name">
+   <intent-filter>
+    <action android:name="android.intent.action.MAIN" />
+    <category android:name="android.intent.category.LAUNCHER" />
+   </intent-filter>
+  </activity>
+
+
+  <activity android:name="com.kg.emailalbum.mobile.EmailAlbumPreferences"></activity>
+  <activity android:name="com.kg.emailalbum.mobile.util.ActivityPickerActivity" android:theme="@android:style/Theme.Dialog" />
+  <provider android:name="com.kg.oifilemanager.filemanager.FileManagerProvider" android:authorities="com.kg.emailalbum.share"></provider>
+ </application>
+ <supports-screens android:normalScreens="true" android:anyDensity="true" android:resizeable="true"
+  android:largeScreens="true" android:smallScreens="true">
+ </supports-screens>
+ <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
+ <uses-permission android:name="android.permission.SET_WALLPAPER" />
+ <uses-permission android:name="android.permission.WAKE_LOCK" />
+ <uses-permission android:name="android.permission.INTERNET"></uses-permission>
+ <!-- GMail -->
+ <uses-permission android:name="com.google.android.providers.gmail.permission.READ_GMAIL"></uses-permission>
+ <!-- GMail on Verizon Droid 2.2 -->
+ <uses-permission android:name="com.google.android.gm.permission.READ_GMAIL"></uses-permission>
+ <!-- Yahoo Mail app -->
+ <uses-permission android:name="com.yahoo.mobile.client.android.permissions.YAHOO_INTER_APP"></uses-permission>
+ <!-- AOSP email app -->
+ <uses-permission android:name="com.android.email.permission.READ_ATTACHMENT"></uses-permission>
+ <uses-permission android:name="android.permission.READ_SMS"></uses-permission>
+</manifest> 
