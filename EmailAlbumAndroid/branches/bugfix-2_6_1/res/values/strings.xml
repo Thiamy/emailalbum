@@ -88,6 +88,8 @@
   ACRA : http://acra.googlecode.com\n
 	</string>
  <string name="changelog">
+  Fixed in version 2.10.1:\n
+  - Addition of the permission required for opening K9 mail attachments.\n
   New in version 2.10.0:\n
   - When sending album, the choice of the sender application is offered through a QuickAction bubble. This looks nicer and allowed to remove EmailAlbum from the possible sender which was a bad choice and caused most of the reported application crashes.\n 
  </string>
