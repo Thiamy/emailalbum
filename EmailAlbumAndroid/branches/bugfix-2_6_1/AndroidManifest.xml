@@ -96,5 +96,7 @@
  <uses-permission android:name="com.yahoo.mobile.client.android.permissions.YAHOO_INTER_APP"></uses-permission>
  <!-- AOSP email app -->
  <uses-permission android:name="com.android.email.permission.READ_ATTACHMENT"></uses-permission>
+ <!-- K9 mail -->
+ <uses-permission android:name="com.fsck.k9.permission.READ_ATTACHMENT"></uses-permission>
  <uses-permission android:name="android.permission.READ_SMS"></uses-permission>
 </manifest> 
