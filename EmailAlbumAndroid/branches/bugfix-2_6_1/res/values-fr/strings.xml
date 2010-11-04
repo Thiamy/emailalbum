@@ -90,6 +90,8 @@
   Rapports d\'erreur gérés avec ACRA : http://acra.googlecode.com\n
 	</string>
  <string name="changelog">
+  Corrigé en version 2.10.1:\n
+  - Ajout de la permission nécessaire pour ouvrir les pièces jointes de l\'application K9 mail.\n
   Nouveautés version 2.10.0:\n
   - Lors de l\'envoi de l\'album, le choix de l\'application se fait désormais via une bulle \'QuickAction\'. C\'est plus joli et cela permet d\'éviter de laisser la possibilité de sélectionner EmailAlbum comme application d\'envoi, ce qui était la raison de la plupart des erreurs applicatives rencontrées.\n 
  </string>
