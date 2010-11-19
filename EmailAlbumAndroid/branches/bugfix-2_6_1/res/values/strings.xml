@@ -88,6 +88,8 @@
   ACRA : http://acra.googlecode.com\n
 	</string>
  <string name="changelog">
+  Version 2.10.2:\n
+  - Just updated application crash reporting library (ACRA)\n
   Fixed in version 2.10.1:\n
   - Addition of the permission required for opening K9 mail attachments.\n
   New in version 2.10.0:\n
