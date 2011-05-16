@@ -1,15 +1,17 @@
 package com.kg.emailalbum.mobile;
 
 import org.acra.ACRA;
+import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
 
 import android.app.Application;
 
-@ReportsCrashes(formKey = "dDN6NDdnN2I2eWU1SW5XNmNyWUljWmc6MQ",
-        resToastText = R.string.crash_toast_text)
+@ReportsCrashes(formKey = "dFpta2o4RmVfZ2FrTk15U3lXeEltdHc6MQ", mode = ReportingInteractionMode.TOAST, resToastText = R.string.crash_toast_text)
 public class EmailAlbumApplication extends Application {
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see android.app.Application#onCreate()
      */
     @Override
@@ -17,6 +19,5 @@ public class EmailAlbumApplication extends Application {
         ACRA.init(this);
         super.onCreate();
     }
-
 
 }
