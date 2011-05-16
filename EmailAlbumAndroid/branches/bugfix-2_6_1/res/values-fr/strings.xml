@@ -205,7 +205,7 @@
  <string name="copy_button">Copy here</string>
 
  <string name="copied_file_name">Copy of %s</string>
- <string name="copied_file_name_2">Copy %d of %s</string>
+ <string name="copied_file_name_2" formatted="false">Copy %d of %s</string>
 
  <string name="error_creating_new_folder">Impossible de créer le nouveau dossier.</string>
  <string name="error_deleting_file">Impossible de supprimer le fichier.</string>
