@@ -18,6 +18,7 @@
  <!-- K9 mail -->
  <uses-permission android:name="com.fsck.k9.permission.READ_ATTACHMENT"></uses-permission>
  <uses-permission android:name="android.permission.READ_SMS"></uses-permission>
+ <uses-permission android:name="android.permission.READ_LOGS"></uses-permission>
 
  <application android:icon="@drawable/icon" android:label="@string/app_name" android:name="EmailAlbumApplication">
 

@@ -84,7 +84,8 @@ public class CacheMap<K, V> extends ConcurrentHashMap<K, V> {
 		accessList.clear();
 	}
 
-	@Override
+    @SuppressWarnings("unchecked")
+    @Override
 	public V get(Object key) {
 		accessEntry((K) key);
 		return super.get(key);

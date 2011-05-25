@@ -107,7 +107,7 @@ public class ItemsLoader extends Thread {
                 Log.e(LOG_TAG, "Error : ", e);
             }
         } else {
-            ErrorReporter.getInstance().addCustomData("imageUri" , imageUri == null ? "null" : imageUri.toString());
+            ErrorReporter.getInstance().putCustomData("imageUri", imageUri == null ? "null" : imageUri.toString());
             Log.e(LOG_TAG, "Context or imageUri are null !");
         }
         return result;

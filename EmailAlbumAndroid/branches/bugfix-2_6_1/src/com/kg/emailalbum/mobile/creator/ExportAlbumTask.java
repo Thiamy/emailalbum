@@ -123,19 +123,19 @@ public class ExportAlbumTask extends AsyncTask<File, Integer, Uri> {
         // Reset progress dialog in case of reuse.
         publishProgress(0);
 
-        ErrorReporter.getInstance().addCustomData("nbPics", "" + mContentModel.size());
-        ErrorReporter.getInstance().addCustomData("ExportSize", mPictureSize.name());
+        ErrorReporter.getInstance().putCustomData("nbPics", "" + mContentModel.size());
+        ErrorReporter.getInstance().putCustomData("ExportSize", mPictureSize.name());
 
         File album;
         if (mAlbumType.equals(AlbumTypes.MAIL)) {
-            ErrorReporter.getInstance().addCustomData("Format", "Mail Attachments");
+            ErrorReporter.getInstance().putCustomData("Format", "Mail Attachments");
             album = dests[0];
             // Total progress count.
             int count = mContentModel.size();
             int itemNumber = 0;
             synchronized (mContentModel) {
                 for (AlbumItem item : mContentModel) {
-                    ErrorReporter.getInstance().addCustomData("CurrentPic", "" + itemNumber);
+                    ErrorReporter.getInstance().putCustomData("CurrentPic", "" + itemNumber);
                     try {
                         // Create the file name. All pictures have to be
                         // named so that their alphabetical order is the
@@ -149,7 +149,7 @@ public class ExportAlbumTask extends AsyncTask<File, Integer, Uri> {
                         Bitmap bmp = BitmapLoader.load(mContext, item.uri, mPictureSize.getWidth(),
                                 mPictureSize.getHeight(), Bitmap.Config.ARGB_8888, false);
                         if (bmp != null) {
-                            ErrorReporter.getInstance().addCustomData("Apply rotation ?",
+                            ErrorReporter.getInstance().putCustomData("Apply rotation ?",
                                     "" + (item.rotation % 360 != 0));
                             if (item.rotation % 360 != 0) {
                                 // Apply the user specified rotation
@@ -159,7 +159,7 @@ public class ExportAlbumTask extends AsyncTask<File, Integer, Uri> {
                             OutputStream out = new FileOutputStream(new File(album, picName));
 
                             // Write the picture to the temp dir
-                            ErrorReporter.getInstance().addCustomData("bmp is null ?", "" + (bmp == null));
+                            ErrorReporter.getInstance().putCustomData("bmp is null ?", "" + (bmp == null));
                             bmp.compress(CompressFormat.JPEG, mPictureQuality, out);
 
                             mContentFileBuilder.put(picName, item.caption);
@@ -168,10 +168,10 @@ public class ExportAlbumTask extends AsyncTask<File, Integer, Uri> {
                             bmp.recycle();
                             out.close();
                         } else {
-                            ErrorReporter.getInstance().addCustomData("item.uri", item.uri.toString());
-                            ErrorReporter.getInstance().addCustomData("mPictureSize.getWidth()",
+                            ErrorReporter.getInstance().putCustomData("item.uri", item.uri.toString());
+                            ErrorReporter.getInstance().putCustomData("mPictureSize.getWidth()",
                                     "" + mPictureSize.getWidth());
-                            ErrorReporter.getInstance().addCustomData("mPictureSize.getHeight()",
+                            ErrorReporter.getInstance().putCustomData("mPictureSize.getHeight()",
                                     "" + mPictureSize.getHeight());
                             ErrorReporter
                                     .getInstance()
@@ -197,9 +197,9 @@ public class ExportAlbumTask extends AsyncTask<File, Integer, Uri> {
             }
 
             String albumExtension = ".jar";
-            ErrorReporter.getInstance().addCustomData("Format", "EmailAlbum");
+            ErrorReporter.getInstance().putCustomData("Format", "EmailAlbum");
             if (mAlbumType == AlbumTypes.ZIP) {
-                ErrorReporter.getInstance().addCustomData("Format", "Zip");
+                ErrorReporter.getInstance().putCustomData("Format", "Zip");
                 albumExtension = ".zip";
             }
             album = new File(dests[0], mAlbumName.replaceAll("\\W", "_") + timestamp + albumExtension);
@@ -239,7 +239,7 @@ public class ExportAlbumTask extends AsyncTask<File, Integer, Uri> {
                 int itemNumber = 0;
                 synchronized (mContentModel) {
                     for (AlbumItem item : mContentModel) {
-                        ErrorReporter.getInstance().addCustomData("CurrentPic", "" + itemNumber);
+                        ErrorReporter.getInstance().putCustomData("CurrentPic", "" + itemNumber);
                         // Create the file name. All pictures have to be
                         // named so that their alphabetical order is the
                         // order set by the user for the album.
@@ -261,7 +261,7 @@ public class ExportAlbumTask extends AsyncTask<File, Integer, Uri> {
                         Bitmap bmp = BitmapLoader.load(mContext, item.uri, mPictureSize.getWidth(),
                                 mPictureSize.getHeight(), Bitmap.Config.ARGB_8888, false);
                         if (bmp != null) {
-                            ErrorReporter.getInstance().addCustomData("Apply rotation ?",
+                            ErrorReporter.getInstance().putCustomData("Apply rotation ?",
                                     "" + (item.rotation % 360 != 0));
                             if (item.rotation % 360 != 0) {
                                 // Apply the user specified rotation
@@ -269,16 +269,16 @@ public class ExportAlbumTask extends AsyncTask<File, Integer, Uri> {
                             }
                             out.putNextEntry(entry);
                             // Write the picture to the album
-                            ErrorReporter.getInstance().addCustomData("bmp is null ?", "" + (bmp == null));
+                            ErrorReporter.getInstance().putCustomData("bmp is null ?", "" + (bmp == null));
                             bmp.compress(CompressFormat.JPEG, mPictureQuality, out);
                             // Get rid of the bitmap to avoid memory leaks
                             bmp.recycle();
                             out.closeEntry();
                         } else {
-                            ErrorReporter.getInstance().addCustomData("item.uri", item.uri.toString());
-                            ErrorReporter.getInstance().addCustomData("mPictureSize.getWidth()",
+                            ErrorReporter.getInstance().putCustomData("item.uri", item.uri.toString());
+                            ErrorReporter.getInstance().putCustomData("mPictureSize.getWidth()",
                                     "" + mPictureSize.getWidth());
-                            ErrorReporter.getInstance().addCustomData("mPictureSize.getHeight()",
+                            ErrorReporter.getInstance().putCustomData("mPictureSize.getHeight()",
                                     "" + mPictureSize.getHeight());
                             ErrorReporter
                                     .getInstance()

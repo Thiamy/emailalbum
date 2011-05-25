@@ -1,17 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-	<!--
-		Copyright 2009, 2010 Kevin Gaudin This file is part of EmailAlbum.
-
-		EmailAlbum is free software: you can redistribute it and/or modify it
-		under the terms of the GNU General Public License as published by the
-		Free Software Foundation, either version 3 of the License, or (at your
-		option) any later version. EmailAlbum is distributed in the hope that
-		it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-		warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
-		the GNU General Public License for more details. You should have
-		received a copy of the GNU General Public License along with
-		EmailAlbum. If not, see <http://www.gnu.org/licenses/>.
-	-->
+<!-- Copyright 2009, 2010 Kevin Gaudin This file is part of EmailAlbum. EmailAlbum 
+	is free software: you can redistribute it and/or modify it under the terms 
+	of the GNU General Public License as published by the Free Software Foundation, 
+	either version 3 of the License, or (at your option) any later version. EmailAlbum 
+	is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
+	without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+	PURPOSE. See the GNU General Public License for more details. You should 
+	have received a copy of the GNU General Public License along with EmailAlbum. 
+	If not, see <http://www.gnu.org/licenses/>. -->
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
 	android:title="@string/app_name">
 	<PreferenceScreen android:title="@string/creator_pref_screen"
@@ -77,9 +73,19 @@
 				android:key="clearcache" android:summary="@string/pref_clearcache_summary" />
 		</PreferenceCategory>
 	</PreferenceScreen>
+	<PreferenceScreen android:title="@string/reports_pref_screen"
+		android:key="reportsscreen">
+		<CheckBoxPreference android:key="acra.disable"
+			android:title="@string/pref_disable_acra" android:summaryOn="@string/pref_acra_disabled"
+			android:summaryOff="@string/pref_acra_enabled" android:defaultValue="false" />
+		<CheckBoxPreference android:key="acra.syslog.enable"
+			android:summaryOn="@string/pref_acra_syslog_enabled"
+			android:summaryOff="@string/pref_acra_syslog_disabled" android:title="@string/pref_acra_syslog"
+			android:defaultValue="true" />
+		<EditTextPreference android:key="acra.user.email"
+			android:title="@string/pref_acra_user_email" android:summary="@string/pref_acra_user_email_summary" />
+	</PreferenceScreen>
 	<Preference android:title="@string/pref_clearcache_title"
 		android:key="clearcache" android:summary="@string/pref_clearcache_summary" />
-	<CheckBoxPreference android:key="acra.disable"
-		android:title="@string/pref_disable_acra" android:summaryOn="@string/pref_acra_disabled"
-		android:summaryOff="@string/pref_acra_enabled" android:defaultValue="false" />
+
 </PreferenceScreen>

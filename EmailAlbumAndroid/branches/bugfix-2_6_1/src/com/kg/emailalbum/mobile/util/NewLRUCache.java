@@ -41,6 +41,7 @@ public class NewLRUCache<K, V> {
      * @param cacheSize
      *            is a positive integer.
      */
+    @SuppressWarnings("serial")
     public NewLRUCache(int cacheSize) {
         this.cacheSize = (cacheSize < 1) ? 1000 : cacheSize;
         int initialCapacity = (int) (cacheSize * 0.75);
