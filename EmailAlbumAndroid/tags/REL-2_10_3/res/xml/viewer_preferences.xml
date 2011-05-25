@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2009, 2010 Kevin Gaudin This file is part of EmailAlbum. EmailAlbum 
+	is free software: you can redistribute it and/or modify it under the terms 
+	of the GNU General Public License as published by the Free Software Foundation, 
+	either version 3 of the License, or (at your option) any later version. EmailAlbum 
+	is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
+	without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+	PURPOSE. See the GNU General Public License for more details. You should 
+	have received a copy of the GNU General Public License along with EmailAlbum. 
+	If not, see <http://www.gnu.org/licenses/>. -->
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+	android:title="@string/app_name">
+	<PreferenceScreen android:title="@string/creator_pref_screen"
+		android:key="creatorscreen">
+		<com.hlidskialf.android.preference.SeekBarPreference
+			android:key="picturesquality" android:title="@string/pref_picturesquality_title"
+			android:summary="@string/pref_picturesquality_summary"
+			android:dialogMessage="@string/pref_picturesquality_summary"
+			android:defaultValue="@string/pref_def_picturesquality" android:text=""
+			android:max="100" />
+		<ListPreference android:key="picturessize"
+			android:summary="@string/pref_picturessize_summary" android:entries="@array/picturessizes"
+			android:entryValues="@array/picturessizesvalues" android:title="@string/pref_picturessize_title"
+			android:dialogTitle="@string/pref_picturessize_title"
+			android:defaultValue="@string/pref_def_picturessize" />
+		<ListPreference android:key="albumtype"
+			android:summary="@string/pref_albumtype_summary" android:entries="@array/albumtypes"
+			android:entryValues="@array/albumtypesvalues" android:title="@string/pref_albumtype_title"
+			android:dialogTitle="@string/pref_albumtype_title"
+			android:defaultValue="@string/pref_def_albumtype" />
+		<EditTextPreference android:title="@string/pref_albumname_title"
+			android:key="albumname" android:defaultValue="@string/pref_def_albumname"
+			android:summary="@string/pref_albumname_summary" android:maxLines="1"
+			android:maxLength="20" android:imeOptions="actionDone"
+			android:singleLine="true" />
+		<CheckBoxPreference android:title="@string/pref_albumtimestamp_title"
+			android:summaryOn="@string/pref_albumtimestamp_on"
+			android:summaryOff="@string/pref_albumtimestamp_off" android:key="albumtimestamp"
+			android:defaultValue="true"></CheckBoxPreference>
+		<PreferenceCategory android:title="@string/prefcat_cache">
+			<Preference android:title="@string/pref_clearcache_title"
+				android:key="clearcache" android:summary="@string/pref_clearcache_summary" />
+		</PreferenceCategory>
+	</PreferenceScreen>
+	<PreferenceScreen android:title="@string/viewer_pref_screen"
+		android:key="viewerscreen">
+		<PreferenceCategory android:title="@string/prefcat_animation">
+
+
+			<ListPreference android:key="animationtype"
+				android:summary="@string/pref_animation_summary" android:entries="@array/animations"
+				android:entryValues="@array/animationsvalues" android:title="@string/pref_animation_title"
+				android:dialogTitle="@string/pref_animation_title"
+				android:defaultValue="@string/pref_def_anim" />
+
+		</PreferenceCategory>
+		<PreferenceCategory android:title="@string/prefcat_slideshow">
+			<EditTextPreference android:title="@string/pref_slideshow_period_title"
+				android:key="slideshow_period" android:defaultValue="5"
+				android:summary="@string/pref_slideshow_period_summary"
+				android:numeric="integer" android:maxLength="3" />
+			<CheckBoxPreference android:title="@string/pref_slideshow_loop_title"
+				android:summaryOn="@string/pref_slideshow_loop_sum_on"
+				android:summaryOff="@string/pref_slideshow_loop_sum_off"
+				android:key="slideshow_loop" android:defaultValue="false"></CheckBoxPreference>
+			<CheckBoxPreference android:title="@string/pref_slideshow_random_animation_title"
+				android:summaryOn="@string/pref_slideshow_random_animation_title_sum_on"
+				android:summaryOff="@string/pref_slideshow_random_animation_title_sum_off"
+				android:key="slideshow_random_animation" android:defaultValue="false"></CheckBoxPreference>
+		</PreferenceCategory>
+		<PreferenceCategory android:title="@string/prefcat_cache">
+			<Preference android:title="@string/pref_clearcache_title"
+				android:key="clearcache" android:summary="@string/pref_clearcache_summary" />
+		</PreferenceCategory>
+	</PreferenceScreen>
+	<PreferenceScreen android:title="@string/reports_pref_screen"
+		android:key="reportsscreen">
+		<CheckBoxPreference android:key="acra.disable"
+			android:title="@string/pref_disable_acra" android:summaryOn="@string/pref_acra_disabled"
+			android:summaryOff="@string/pref_acra_enabled" android:defaultValue="false" />
+		<CheckBoxPreference android:key="acra.syslog.enable"
+			android:summaryOn="@string/pref_acra_syslog_enabled"
+			android:summaryOff="@string/pref_acra_syslog_disabled" android:title="@string/pref_acra_syslog"
+			android:defaultValue="true" />
+		<EditTextPreference android:key="acra.user.email"
+			android:title="@string/pref_acra_user_email" android:summary="@string/pref_acra_user_email_summary" />
+	</PreferenceScreen>
+	<Preference android:title="@string/pref_clearcache_title"
+		android:key="clearcache" android:summary="@string/pref_clearcache_summary" />
+
+</PreferenceScreen>
