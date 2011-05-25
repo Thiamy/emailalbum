@@ -29,7 +29,6 @@ import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
 
@@ -101,9 +100,9 @@ public class BitmapLoader {
         int srcWidth = fpResult.options.outWidth;
         int srcHeight = fpResult.options.outHeight;
 
-        ErrorReporter.getInstance().addCustomData("BitmapLoader.RequiredDim",
+        ErrorReporter.getInstance().putCustomData("BitmapLoader.RequiredDim",
                 width + " x " + height);
-        ErrorReporter.getInstance().addCustomData("BitmapLoader.SourceDim",
+        ErrorReporter.getInstance().putCustomData("BitmapLoader.SourceDim",
                 srcWidth + " x " + srcHeight);
 
         // Log.d(LOG_TAG, "Source picture has dimension " + srcWidth + " x "
@@ -164,7 +163,7 @@ public class BitmapLoader {
         // finer sampled bitmap
         if (srcWidth > fpResult.finalWidth) {
             fpResult.options.inSampleSize = srcWidth / fpResult.finalWidth;
-            ErrorReporter.getInstance().addCustomData(
+            ErrorReporter.getInstance().putCustomData(
                     "BitmapLoader.SampleSize",
                     "" + fpResult.options.inSampleSize);
         }

@@ -200,8 +200,16 @@ public class EmailAlbumEditor extends ListActivity {
          *            add.
          */
         public void addAllUris(Collection<Uri> items) {
+            boolean excludedVideo = false;
             for (Uri uri : items) {
-                mContentModel.add(new AlbumItem(uri, null, ItemsLoader.getThumbnail(getApplicationContext(), uri)));
+                if (!uri.toString().startsWith("content://media/external/video")) {
+                    mContentModel.add(new AlbumItem(uri, null, ItemsLoader.getThumbnail(getApplicationContext(), uri)));
+                } else {
+                    if (!excludedVideo) {
+                        excludedVideo = true;
+                        Toast.makeText(getApplicationContext(), R.string.error_exclude_video, Toast.LENGTH_LONG).show();
+                    }
+                }
             }
             notifyDataSetChanged();
         }
@@ -458,10 +466,10 @@ public class EmailAlbumEditor extends ListActivity {
                     Toast.makeText(ctx, R.string.error_out_of_mem_rotate, Toast.LENGTH_LONG).show();
                 }
             } else {
-                ErrorReporter.getInstance().addCustomData("AlbumItem.uri", uri.toString());
-                ErrorReporter.getInstance().addCustomData("AlbumItem.caption", this.caption);
-                ErrorReporter.getInstance().addCustomData("AlbumItem.rotation", "" + this.rotation);
-                ErrorReporter.getInstance().addCustomData("AlbumItem.thumbUri", "null");
+                ErrorReporter.getInstance().putCustomData("AlbumItem.uri", uri.toString());
+                ErrorReporter.getInstance().putCustomData("AlbumItem.caption", this.caption);
+                ErrorReporter.getInstance().putCustomData("AlbumItem.rotation", "" + this.rotation);
+                ErrorReporter.getInstance().putCustomData("AlbumItem.thumbUri", "null");
                 ErrorReporter.getInstance().handleException(
                         new Exception("Rotating an AlbumItem without a thumbUri !!!"));
             }

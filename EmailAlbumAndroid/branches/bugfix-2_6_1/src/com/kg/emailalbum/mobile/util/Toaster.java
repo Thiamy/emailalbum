@@ -4,9 +4,6 @@ import android.content.Context;
 import android.os.Looper;
 import android.widget.Toast;
 
-import com.kg.emailalbum.mobile.R;
-import com.kg.emailalbum.mobile.creator.EmailAlbumEditor;
-
 public class Toaster extends Thread {
     
     private int mMessageId;
