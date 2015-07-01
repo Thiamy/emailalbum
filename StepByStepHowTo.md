@@ -1,0 +1,14 @@
+# Step by step EmailAlbum How-to. #
+
+You must have a Java JRE v1.4.2 or higher (Java 6 is recommended for better performance) installed on your computer : http://www.java.com/
+
+Download [EmailAlbum](http://code.google.com/p/emailalbum/downloads/list) and execute it. With Windows and a correct Java version, double-clicking it is enough to execute it.
+
+For other Operating Systems, or if double-clicking it fails, run the command line :
+```
+java -jar emailalbum-1.0.1.jar
+```
+
+The main EmailAlbum window opens. It is a file selector allowing to select JPEG pictures.
+
+TODO
